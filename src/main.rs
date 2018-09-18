@@ -25,28 +25,34 @@ use std::{thread, time};
 
 const CONNECTION_STRING: &str = "127.0.0.1:4091";
 
-
-fn handle_client(mut stream: TcpStream) {
-    println!("handle_client 0.");
-    // ブロックし続けないようにする。
-    stream.set_nonblocking(true).expect("set_nonblocking call failed");
-    // 読み取り。
-    let mut buf = vec![];
-    match stream.read_to_end(&mut buf) {
-        Ok(_) => {
-            println!("Buf: {}", String::from_utf8_lossy(buf.as_slice()));
-        },
-        Err(ref e) if e.kind() == io::ErrorKind::WouldBlock => {
-            // wait until network socket is ready, typically implemented
-            // via platform-specific APIs such as epoll or IOCP
-            // wait_for_fd();
-            println!("10 msec wait.");
-            let ten_millis = time::Duration::from_millis(10);
-            thread::sleep(ten_millis);
-        },
-        Err(e) => panic!("encountered IO error: {}", e),
-    };
-    println!("handle_client 1.");
+// クライアントをずっと捕まえておく。
+fn handle_client(mut stream: &TcpStream) {
+    println!("Capture client.");
+    loop {
+        // ブロックし続けないようにする。
+        // stream.set_nonblocking(true).expect("set_nonblocking call failed");
+        // 読み取り。
+        let mut buf = vec![];
+        match stream.read_to_end(&mut buf) {
+            Ok(len) => {
+                println!("Buf: {}, Len: {}.", String::from_utf8_lossy(buf.as_slice()), len);
+                if 0==len {
+                    // 長さが 0 なら切断と判定する。
+                    break;
+                }
+            },
+            Err(ref e) if e.kind() == io::ErrorKind::WouldBlock => {
+                // wait until network socket is ready, typically implemented
+                // via platform-specific APIs such as epoll or IOCP
+                // wait_for_fd();
+                println!("10 msec wait.");
+                let ten_millis = time::Duration::from_millis(10);
+                thread::sleep(ten_millis);
+            },
+            Err(e) => panic!("encountered IO error: {}", e),
+        };
+    }
+    println!("Release client.");
 }
 
 fn main() {
@@ -57,12 +63,17 @@ fn main() {
 
     println!("Listen!");
 
-    // accept connections and process them serially
-    for stream in listener.incoming() {
+    // ずっと。接続があるたびにループが回る。
+    for stream1 in listener.incoming() {
         println!("Incoming 0.");
-        handle_client(stream.unwrap());
+        // 別スレッドを立てる。
+        thread::spawn(move || {
+            println!("Spawn 0.");
+            handle_client(&stream1.unwrap());
+            println!("Spawn 1.");
+        });
         println!("Incoming 1.");
     }
 
-    println!("End server.");
+    // println!("End server.");
 }
