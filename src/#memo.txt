@@ -1,0 +1,81 @@
+                // LOGIN:<username> OK
+                // LOGIN:incorrect
+                //
+                // LOGOUT:completed
+
+                /*
+BEGIN Game_Summary
+Protocol_Version:1.2
+Protocol_Mode:Server
+Format:Shogi 1.0
+Declaration:Jishogi 1.1
+Game_ID:20150505-CSA25-3-5-7
+Name+:TANUKI
+Name-:KITSUNE
+Your_Turn:+
+Rematch_On_Draw:NO
+To_Move:+
+Max_Moves:256
+BEGIN Time
+Time_Unit:1sec
+Total_Time:600
+Byoyomi:10
+Least_Time_Per_Move:1
+END Time
+BEGIN Position
+P1-KY-KE-GI-KI-OU-KI-GI-KE-KY
+P2 * -HI *  *  *  *  * -KA * 
+P3-FU-FU-FU-FU-FU-FU-FU-FU-FU
+P4 *  *  *  *  *  *  *  *  * 
+P5 *  *  *  *  *  *  *  *  * 
+P6 *  *  *  *  *  *  *  *  * 
+P7+FU+FU+FU+FU+FU+FU+FU+FU+FU
+P8 * +KA *  *  *  *  * +HI * 
+P9+KY+KE+GI+KI+OU+KI+GI+KE+KY
+P+
+P-
++
++2726FU,T12
+-3334FU,T6
+END Position
+END Game_Summary
+                 */
+
+                // REJECT:<GameID> by <rejector>
+                //
+                //
+                // +7776FU,T12
+                //
+                // #SENNICHITE
+                // #DRAW
+                //
+                // #OUTE_SENNICHITE
+                // #WIN(LOSE)
+                //
+                // #TIME_UP
+                // #WIN(LOSE)
+                //
+                // %TORYO,T4
+                // #RESIGN
+                // #WIN(LOSE)
+                //
+                // %KACHI,T8
+                // #JISHOGI
+                // #WIN(LOSE)
+                //
+                // %KACHI,T8
+                // #ILLEGAL_MOVE
+                // #WIN(LOSE)
+                //
+                // #MAX_MOVES
+                // #CENSORED
+                //
+                // #CHUDAN
+                //
+                // またクライアントは対局中、手番にかかわらず、長さゼロの文字列、もしくはLF1文字のみをサーバに送信することができる。
+                // サーバは前者を受け取った場合、単純に無視する。後者を受け取った場合、短い待ち時間の後にLF1文字のみをそのクライアントに返信する。
+                // クライアントは、これらの送信を頻繁に行ってはならない。 具体的には、当該クライアントからの何らかの文字列をサーバが受信してから30秒を経ずして同一のクライアントからこれらの送信を行ってはならない。
+                // クライアントがこの規定に反した場合、サーバは当該クライアントを反則負けとして扱うことができる。
+                //
+                // #ILLEGAL_ACTION
+                // #LOSE(WIN)

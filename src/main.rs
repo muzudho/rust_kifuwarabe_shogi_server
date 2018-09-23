@@ -1,10 +1,11 @@
 /// # 参考URL。
 /// - https://doc.rust-lang.org/std/net/struct.TcpStream.html |Struct std::net::TcpStream
+/// - https://gigazine.net/news/20120831-10000-jointer-1-server-cedec2012/ |サーバーマシン1台で同時接続者数1万名を実現するにはどうすればいいのかというノウハウと考え方
 ///
 /// # コマンド例。
 ///
 /// ```
-/// ### コンパイル(開発中)。
+/// ### コンパイル(開発中)。 [Windows]+[R]キー, "cmd"+[Enter]。
 /// cd C:\MuzudhoDrive\projects_rust\rust_kifuwarabe_shogi_server
 /// cargo clippy
 ///
@@ -20,39 +21,80 @@
 use std::net::{TcpListener, TcpStream};
 use std::io;
 use std::io::Read;
-// use std::time::Duration;
 use std::{thread, time};
+use std::collections::HashMap;
+#[macro_use]
+extern crate lazy_static;
+use std::time::Duration;
 
-const CONNECTION_STRING: &str = "127.0.0.1:4091";
+
+const CONNECTION_STRING: &str = "127.0.0.1:4081";
+
+/// クライアントの変数。
+struct ClientVar {
+
+}
+impl ClientVar {
+    pub fn new() -> ClientVar {
+        ClientVar {
+
+        }
+    }
+}
+
+// グローバル変数。
+use std::sync::RwLock;
+lazy_static! {
+    /// スレッド間で共有する。 <接続番号,変数>
+    static ref CLIENT_MAP: RwLock<HashMap<i64, ClientVar>> = RwLock::new(HashMap::new());
+}
 
 
 fn main() {
     println!("I am a server!");
 
-    // ポートを開いて待ち受け。
-    let listener = TcpListener::bind(CONNECTION_STRING).unwrap();
+    // 接続受付スレッド。
+    thread::spawn(move || {
+        println!("Listen!");
+        let mut connection_number = 0;
+        let sever_listener = TcpListener::bind(CONNECTION_STRING).unwrap();
+        for stream_wrap in sever_listener.incoming() {
+            CLIENT_MAP.try_write().unwrap().insert(connection_number, ClientVar::new());
+            thread::spawn(move || {
+                println!("Welcome!");
+                handle_client(connection_number, &stream_wrap.unwrap());
+            });
+            connection_number += 1;
+        }
+    });
 
-    println!("Listen!");
-
-    // ずっと。接続があるたびにループが回る。
-    for stream1 in listener.incoming() {
-        println!("Incoming 0.");
-        // 別スレッドを立てる。( FIXME スレッドを何個も立てたくないんだが)
-        thread::spawn(move || {
-            println!("Spawn 0.");
-            handle_client(&stream1.unwrap());
-            println!("Spawn 1.");
-        });
-        println!("Incoming 1.");
+    // 各クライアントに何かしたいことがあれば 以下に書く。
+    loop {
+        /*
+        let mut count = 0;
+        match CLIENT_MAP.try_read() {
+            Ok(client_map) => {
+                for (_connection_number, _client_var) in client_map.iter() {
+                    count += 1;
+                }
+            },
+            Err(_) => unreachable!(),
+        };
+        println!("count = {}", count);
+        */
+        thread::sleep(Duration::from_millis(1));
     }
-
     // サーバーは、[Ctrl]+[C]キーで強制終了しろだぜ☆（＾～＾）
 }
 
 
 /// クライアントをずっと捕まえておく。
-fn handle_client(stream: &TcpStream) {
-    println!("Capture client.");
+fn handle_client(connection_number:i64, stream: &TcpStream) {
+    println!("Capture client. {}", connection_number);
+
+    // TODO クライアント名を取得したい。
+    // let name = "Kifuwarabe"; // 仮
+
     // ブロックし続けないようにする。
     // let _ = stream.set_read_timeout(Some(Duration::new(10, 0)));
     stream.set_nonblocking(true).expect("set_nonblocking call failed");
@@ -73,92 +115,11 @@ fn handle_client(stream: &TcpStream) {
                 index += 1;
                 if buf[0] == b'\n' {
                     let line = String::from_utf8_lossy(&buf_arr[0..index]);
-                    print!("#Line: {}", line); // 改行は line に入っている。
+                    print!("{}> {}", connection_number, line); // 改行は line に入っている。
                     index = 0;
                 }
 
                 // 何か応答したい。
-                // LOGIN:<username> OK
-                // LOGIN:incorrect
-                //
-                // LOGOUT:completed
-
-                /*
-BEGIN Game_Summary
-Protocol_Version:1.2
-Protocol_Mode:Server
-Format:Shogi 1.0
-Declaration:Jishogi 1.1
-Game_ID:20150505-CSA25-3-5-7
-Name+:TANUKI
-Name-:KITSUNE
-Your_Turn:+
-Rematch_On_Draw:NO
-To_Move:+
-Max_Moves:256
-BEGIN Time
-Time_Unit:1sec
-Total_Time:600
-Byoyomi:10
-Least_Time_Per_Move:1
-END Time
-BEGIN Position
-P1-KY-KE-GI-KI-OU-KI-GI-KE-KY
-P2 * -HI *  *  *  *  * -KA * 
-P3-FU-FU-FU-FU-FU-FU-FU-FU-FU
-P4 *  *  *  *  *  *  *  *  * 
-P5 *  *  *  *  *  *  *  *  * 
-P6 *  *  *  *  *  *  *  *  * 
-P7+FU+FU+FU+FU+FU+FU+FU+FU+FU
-P8 * +KA *  *  *  *  * +HI * 
-P9+KY+KE+GI+KI+OU+KI+GI+KE+KY
-P+
-P-
-+
-+2726FU,T12
--3334FU,T6
-END Position
-END Game_Summary
-                 */
-
-                // REJECT:<GameID> by <rejector>
-                //
-                //
-                // +7776FU,T12
-                //
-                // #SENNICHITE
-                // #DRAW
-                //
-                // #OUTE_SENNICHITE
-                // #WIN(LOSE)
-                //
-                // #TIME_UP
-                // #WIN(LOSE)
-                //
-                // %TORYO,T4
-                // #RESIGN
-                // #WIN(LOSE)
-                //
-                // %KACHI,T8
-                // #JISHOGI
-                // #WIN(LOSE)
-                //
-                // %KACHI,T8
-                // #ILLEGAL_MOVE
-                // #WIN(LOSE)
-                //
-                // #MAX_MOVES
-                // #CENSORED
-                //
-                // #CHUDAN
-                //
-                // またクライアントは対局中、手番にかかわらず、長さゼロの文字列、もしくはLF1文字のみをサーバに送信することができる。
-                // サーバは前者を受け取った場合、単純に無視する。後者を受け取った場合、短い待ち時間の後にLF1文字のみをそのクライアントに返信する。
-                // クライアントは、これらの送信を頻繁に行ってはならない。 具体的には、当該クライアントからの何らかの文字列をサーバが受信してから30秒を経ずして同一のクライアントからこれらの送信を行ってはならない。
-                // クライアントがこの規定に反した場合、サーバは当該クライアントを反則負けとして扱うことができる。
-                //
-                // #ILLEGAL_ACTION
-                // #LOSE(WIN)
             },
             Err(ref e) if e.kind() == io::ErrorKind::WouldBlock => {
                 // ブロックしなければ、ここにくる。
