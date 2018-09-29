@@ -50,11 +50,11 @@ pub fn execute_line(connection_number: i64, line: &str) {
 }
 
 pub fn do_player_name(shell_var: &mut ShellVar, req: &Request, res: &mut dyn Response) {
-    println!("do_player_name: <{} {}", shell_var.connection_number, req.get_groups()[0]);
+    println!("<{} do_player_name: {}", shell_var.connection_number, req.get_groups()[0]);
     res.forward("next");
 }
 
 pub fn do_password(shell_var: &mut ShellVar, req: &Request, res: &mut dyn Response) {
-    println!("do_password: <{} {}", shell_var.connection_number, req.get_groups()[0]);
+    println!("<{} do_password: {}", shell_var.connection_number, req.get_groups()[0]);
     res.forward("next");
 }

@@ -41,6 +41,19 @@ use shell_impl::*;
 
 const CONNECTION_STRING: &str = "127.0.0.1:4081";
 
+/// ロビー。マッチングするためのもの。
+struct Lobby {
+    // 1人で余ってるプレイヤー番号。
+    waiting_player: i64,
+}
+impl Lobby {
+    pub fn new() -> Lobby {
+        Lobby {
+            waiting_player: -1,
+        }
+    }
+}
+
 /// 対局変数。
 struct Game {
     /// 汎用的に利用できるハッシュマップ。
@@ -60,6 +73,9 @@ impl Game {
 // グローバル変数。
 use std::sync::RwLock;
 lazy_static! {
+    /// サーバーのどこからでも使う。
+    static ref LOBBY: RwLock<Lobby> = RwLock::new(Lobby::new());
+
     /// 対局間で共有する。 <対局番号,変数>
     static ref GAME_MAP: RwLock<HashMap<i64, Game>> = RwLock::new(HashMap::new());
 }
@@ -99,7 +115,20 @@ fn main() {
 fn default_coming(connection_number: i64) {
     println!("Welcome {}!", connection_number);
 
-    // 接続番号をたよりに ここで変数を初期化したりする。
+    // 2人接続すればマッチングしようぜ☆（＾ｑ＾）
+    let waiting_player;
+    {
+        waiting_player = LOBBY.try_read().unwrap().waiting_player;
+    }
+
+    if -1!=waiting_player {
+        // 誰かが待機中。
+        // マッチングが成立。
+        println!("Match {} vs {}!", connection_number, waiting_player);
+    } else {
+        // 自分が待機になる。
+        LOBBY.try_write().unwrap().waiting_player = connection_number;
+    }
 }
 
 /**
