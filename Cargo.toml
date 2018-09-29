@@ -9,7 +9,7 @@ serde_json = "1.0"
 
 [dependencies.kifuwarabe_server]
 git = "https://github.com/muzudho/rust_kifuwarabe_server.git"
-rev = "5d7cf3a9f30b594271e224810ddd83dac5ddd698"
+rev = "949344bdc1019837240c4d5b3bfa18b4222c5689"
 
 [dependencies.kifuwarabe_shell]
 git = "https://github.com/muzudho/rust_kifuwarabe_shell.git"

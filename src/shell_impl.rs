@@ -1,6 +1,8 @@
 use kifuwarabe_shell::graph::*;
 use kifuwarabe_shell::shell::*;
 
+use server_impl::*;
+
 const GRAPH_JSON_FILE: &str = "graph.json";
 
 // 任意のオブジェクト。
@@ -49,8 +51,13 @@ pub fn execute_line(connection_number: i64, line: &str) {
     }
 }
 
+/**
+ * プレイヤー名を読み取った。
+ */
 pub fn do_player_name(shell_var: &mut ShellVar, req: &Request, res: &mut dyn Response) {
-    println!("<{} do_player_name: {}", shell_var.connection_number, req.get_groups()[0]);
+    let player_name = &req.get_groups()[0];
+    set_player_name(shell_var.connection_number, &player_name);
+    println!("<{} do_player_name: {}", shell_var.connection_number, player_name);
     res.forward("next");
 }
 
