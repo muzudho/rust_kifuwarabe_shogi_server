@@ -41,7 +41,7 @@ mod shell_impl;
 use shell_impl::*;
 
 mod server_impl;
-//use server_impl::*;
+use server_impl::*;
 
 use std::thread;
 use std::time::Duration;
@@ -161,21 +161,30 @@ AGREE"# => {
  */
 fn default_sending(_connection_number: i64, _res: &mut Response) {
     // 2人待っていれば、マッチングしようぜ☆（＾ｑ＾）
+    if 1 < LOBBY.try_read().unwrap().waiting_players.len() {
+        let player_num0 = LOBBY
+            .try_write()
+            .unwrap()
+            .waiting_players
+            .pop_front()
+            .unwrap();
+        let player_num1 = LOBBY
+            .try_write()
+            .unwrap()
+            .waiting_players
+            .pop_front()
+            .unwrap();
+        println!("マッチング {} vs {}.", player_num0, player_num1);
+
+        // 対局室を作成。
+        let game_number = create_game(player_num0, player_num1);
+        println!(
+            "対局室 {} を作成。 {} vs {}.",
+            game_number, player_num0, player_num1
+        );
+    }
     {
         /*
-        let mut lobby = LOBBY.try_write().unwrap();
-        while 1 < lobby.waiting_players.len() {
-            let player_numbers = [
-                lobby.waiting_players.pop_front().unwrap(),
-                lobby.waiting_players.pop_front().unwrap(),
-            ];
-
-            // 対局室を作成。
-            let game_number = create_game(player_numbers);
-            println!("対局室 {} を作成。 {} vs {}.", game_number,
-                player_numbers[Turn::Black as usize],
-                player_numbers[Turn::White as usize]
-            );
 
             // メッセージ作成。
             /*
@@ -185,7 +194,6 @@ fn default_sending(_connection_number: i64, _res: &mut Response) {
                 GAME_MAP.try_read().unwrap()[&0].game_summary.to_string_ln()
             ))
              */
-        }
         */
     }
 
@@ -202,44 +210,48 @@ fn default_sending(_connection_number: i64, _res: &mut Response) {
      */
 }
 
-fn get_player_data(player_num: i64) -> String {
-    CLIENT_MAP
-        .try_write()
-        .unwrap()
-        .get(&player_num)
-        .unwrap()
-        .properties
-        .get("playerName")
-        .unwrap()
-        .to_string()
-}
-
 /**
  * 対局室を１つ作成。
- * 
+ *
  * # Returns.
  * ゲーム部屋番号。
  */
-fn create_game(player_numbers: [i64; 2]) -> usize {
+fn create_game(player_num0:i64, player_num1:i64) -> usize {
     let game_number;
 
-    let player_name0 = get_player_data(player_numbers[Turn::Black as usize]);
-    let player_name1 = get_player_data(player_numbers[Turn::White as usize]);
+    println!("プレイヤーデータ0: {} 取得", player_num0);
+    let player_name0 = get_player_data(player_num0);
+
+    println!("プレイヤーデータ1: {} 取得", player_num1);
+    let player_name1 = get_player_data(player_num1);
+
+    println!("対局室オブジェクト生成");
+    let mut game = Game::new();
 
     {
-        let mut game = Game::new();
 
         // とりあえず、
+        println!("ゲームIDセット");
         game.game_summary.set_game_id(GAME_ID);
+
+        println!("名前配列セット");
         game.game_summary
             .set_name_arr([player_name0.to_string(), player_name1.to_string()]);
+
+        println!("ターン セット");
         game.game_summary.set_turn(Turn::Black);
 
         {
+            println!("部屋番号取得");
             game_number = GAME_MAP.try_write().unwrap().len();
+            println!("部屋番号 {}", game_number);
         }
         {
-            GAME_MAP.try_write().unwrap().insert(game_number as i64, game);
+            println!("部屋挿入");
+            GAME_MAP
+                .try_write()
+                .unwrap()
+                .insert(game_number as i64, game);
         }
     }
 
