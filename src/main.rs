@@ -182,6 +182,18 @@ fn default_sending(_connection_number: i64, _res: &mut Response) {
             "対局室 {} を作成。 {} vs {}.",
             game_number, player_num0, player_num1
         );
+
+        println!("プレイヤー0: {} を ゲームルーム {} へ移動。",
+            player_num0, game_number);
+        set_player_to_game_room(player_num0, game_number as i64);
+        set_player_state(player_num0, "starting");
+
+        println!("プレイヤー1: {} を ゲームルーム {} へ移動。",
+            player_num1, game_number);
+        set_player_to_game_room(player_num1, game_number as i64);
+        set_player_state(player_num1, "starting");
+
+        println!("マッチング終わり。");
     }
     {
         /*
