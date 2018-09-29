@@ -26,6 +26,9 @@ extern crate kifuwarabe_server;
 use kifuwarabe_server::interfaces::*;
 use kifuwarabe_server::*;
 
+mod models;
+use models::game_summary::*;
+
 const CONNECTION_STRING: &str = "127.0.0.1:4081";
 
 fn main() {
@@ -49,43 +52,14 @@ fn default_receiver(req: &Request, res: &mut Response) {
 
     match req.get_message() {
         "LOGIN kifuwarabe a" => {
+
+            let mut game_summary = GameSummary::new();
+            game_summary.set_game_id(GAME_ID);
+
             res.set_message(&format!(
                 r#"LOGIN:kifuwarabe OK
-BEGIN Game_Summary
-Protocol_Version:1.2
-Protocol_Mode:Server
-Format:Shogi 1.0
-Declaration:Jishogi 1.1
-Game_ID:{}
-Name+:kifuwarabe
-Name-:KITSUNE
-Your_Turn:+
-Rematch_On_Draw:NO
-To_Move:+
-Max_Moves:256
-BEGIN Time
-Time_Unit:1sec
-Total_Time:600
-Byoyomi:10
-Least_Time_Per_Move:1
-END Time
-BEGIN Position
-P1-KY-KE-GI-KI-OU-KI-GI-KE-KY
-P2 * -HI *  *  *  *  * -KA * 
-P3-FU-FU-FU-FU-FU-FU-FU-FU-FU
-P4 *  *  *  *  *  *  *  *  * 
-P5 *  *  *  *  *  *  *  *  * 
-P6 *  *  *  *  *  *  *  *  * 
-P7+FU+FU+FU+FU+FU+FU+FU+FU+FU
-P8 * +KA *  *  *  *  * +HI * 
-P9+KY+KE+GI+KI+OU+KI+GI+KE+KY
-P+
-P-
-+
-END Position
-END Game_Summary
-"#, // 最後に改行が必要。
-                GAME_ID
+{}"#,
+                game_summary.to_string_ln()
             ))
         }
         r#"
