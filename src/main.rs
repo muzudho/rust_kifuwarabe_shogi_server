@@ -20,7 +20,10 @@
 /// ### 開けているポート確認。
 /// netstat
 /// ```
+
+#[macro_use]
 extern crate lazy_static;
+use std::collections::HashMap;
 
 extern crate kifuwarabe_server;
 use kifuwarabe_server::interfaces::*;
@@ -31,8 +34,39 @@ use models::game_summary::*;
 
 const CONNECTION_STRING: &str = "127.0.0.1:4081";
 
+/// 対局変数。
+struct Game {
+    game_summary: GameSummary
+}
+impl Game {
+    pub fn new() -> Game {
+        Game {
+            game_summary: GameSummary::new()
+        }
+    }
+}
+
+// グローバル変数。
+use std::sync::RwLock;
+lazy_static! {
+    /// 対局間で共有する。 <対局番号,変数>
+    static ref GAME_MAP: RwLock<HashMap<i64, Game>> = RwLock::new(HashMap::new());
+}
+
+const GAME_ID: &str = "20180929-KIFUWARABECUP-0";
+
 fn main() {
     println!("I am a shogi server!");
+
+    {
+        let mut game = Game::new();
+
+        game.game_summary.set_game_id(GAME_ID);
+        game.game_summary.set_name_arr(["kifuwarabe".to_string(), "kitune".to_string()]);
+        game.game_summary.set_turn(Turn::Black);
+
+        GAME_MAP.try_write().unwrap().insert(0, game);
+    }
 
     let server = &Server {
         receiver: default_receiver,
@@ -42,8 +76,6 @@ fn main() {
     // サーバーは、[Ctrl]+[C]キーで強制終了しろだぜ☆（＾～＾）
 }
 
-const GAME_ID: &str = "20180929-KFWARABE1-10203";
-
 /**
  * クライアントからの入力は このメソッド内で処理する。
  */
@@ -52,14 +84,10 @@ fn default_receiver(req: &Request, res: &mut Response) {
 
     match req.get_message() {
         "LOGIN kifuwarabe a" => {
-
-            let mut game_summary = GameSummary::new();
-            game_summary.set_game_id(GAME_ID);
-
             res.set_message(&format!(
                 r#"LOGIN:kifuwarabe OK
 {}"#,
-                game_summary.to_string_ln()
+                GAME_MAP.try_read().unwrap()[&0].game_summary.to_string_ln()
             ))
         }
         r#"
@@ -67,7 +95,7 @@ AGREE"# => {
             res.set_message(&format!(
                 r#"START:{}
 "#, // 最後に改行が必要。
-                GAME_ID
+                GAME_MAP.try_read().unwrap()[&0].game_summary.get_game_id()
             ));
         }
         _ => {
