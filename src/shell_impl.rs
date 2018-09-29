@@ -5,15 +5,24 @@ use server_impl::*;
 
 const GRAPH_JSON_FILE: &str = "graph.json";
 
-// 任意のオブジェクト。
+/// 任意のオブジェクト。
 pub struct ShellVar {
     connection_number: i64,
+    /// どのフローが終わったか、識別する文字列。
+    flow_message: String,
 }
 impl ShellVar {
     fn new() -> ShellVar {
         ShellVar {
             connection_number: -1,
+            flow_message: "".to_string(),
         }
+    }
+    pub fn get_flow_message(&self) -> String {
+        self.flow_message.to_string()
+    }
+    pub fn set_flow_message(&mut self, value:&str){
+        self.flow_message = value.to_string();
     }
 }
 
@@ -37,18 +46,19 @@ pub fn setup_graph() {
 }
 
 // クライアント１つごとに、１つのシェルを割り当てる。
-pub fn execute_line(connection_number: i64, line: &str) {
+pub fn execute_line_by_client(connection_number: i64, line: &str) -> String {
     // 任意のオブジェクト。
     let mut shell_var = ShellVar::new();
     shell_var.connection_number = connection_number;
 
-    // 実行。グラフと 任意のオブジェクトを渡す。
-    let mut shell = Shell::new();
-
     {
+        // 実行。グラフと 任意のオブジェクトを渡す。
+        let mut shell = Shell::new();
         let mut graph = GRAPH.try_write().unwrap();
         shell.execute_line(&mut graph, &mut shell_var, line);
     }
+
+    shell_var.get_flow_message()
 }
 
 /**
@@ -61,7 +71,8 @@ pub fn do_player_name(shell_var: &mut ShellVar, req: &Request, res: &mut dyn Res
     res.forward("next");
 }
 
-pub fn do_password(shell_var: &mut ShellVar, req: &Request, res: &mut dyn Response) {
+pub fn do_password(shell_var: &mut ShellVar, req: &Request, _res: &mut dyn Response) {
     println!("<{} do_password: {}", shell_var.connection_number, req.get_groups()[0]);
-    res.forward("next");
+    shell_var.set_flow_message("loginEnd");
+    // res.forward("next");
 }
