@@ -5,3 +5,7 @@ authors = ["むずでょ <muzudho1@gmail.com>"]
 
 [dependencies]
 lazy_static = "1.1.0"
+
+[dependencies.kifuwarabe_server]
+git = "https://github.com/muzudho/rust_kifuwarabe_server.git"
+rev = "d5d449626ce1d14ffe8c8710200cecb9e183a11d"
