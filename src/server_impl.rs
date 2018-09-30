@@ -66,6 +66,21 @@ pub fn get_player_name(player_num: i64) -> String {
         .to_string()
 }
 
+/// # Returns.
+/// 該当無しなら -1
+pub fn get_room_number_by_player(player_num: i64) -> i64 {
+    match CLIENT_MAP
+        .try_read()
+        .expect("CLIENT_MAP.try_read()")
+        .get(&player_num)
+        .unwrap()
+        .properties
+        .get(&"gameRoom".to_string()) {
+            Some(text) => text.parse().unwrap(),
+            None => -1,
+        }
+}
+
 pub fn set_player_to_game_room(player_num: i64, game_number: i64) {
     CLIENT_MAP
         .try_write()
@@ -84,6 +99,47 @@ pub fn set_player_state(player_num: i64, state: &str) {
         .unwrap()
         .properties
         .insert("state".to_string(), state.to_string());
+}
+
+/// # Returns.
+/// 該当するものがなかったなら 空文字列。
+pub fn get_state_by_player(player_num: i64) -> String {
+    match CLIENT_MAP
+        .try_read()
+        .expect("CLIENT_MAP.try_read()")
+        .get(&player_num)
+        .unwrap()
+        .properties
+        .get(&"state".to_string()) {
+            Some(n) => {n.to_string()},
+            None => {"".to_string()},
+        }
+}
+
+pub fn is_state(player_num: i64, state: &str) -> bool {
+    //println!("is_state: {}. expected: {}.", player_num, state);
+
+    get_state_by_player(player_num) == state
+/*
+    match CLIENT_MAP
+        .try_read()
+        .expect("CLIENT_MAP.try_read()")
+        .get(&player_num)
+        .unwrap()
+        .properties
+        .get(&state.to_string()) {
+            Some(n) => {state == n},
+            None => {false},
+        }
+ */
+    /*
+    state == CLIENT_MAP
+        .try_read()
+        .expect("CLIENT_MAP.try_read()")
+        .get(&player_num)
+        .unwrap()
+        .properties[&state.to_string()]
+    */
 }
 
 /**
@@ -128,17 +184,6 @@ pub fn setup_2player_to_match() {
 
         println!("マッチング終わり。");
     }
-}
-
-pub fn is_state(player_num: i64, state: &str) -> bool {
-    state == CLIENT_MAP
-        .try_read()
-        .expect("CLIENT_MAP.try_read()")
-        .get(&player_num)
-        .unwrap()
-        .properties
-        .get(&state.to_string())
-        .unwrap()
 }
 
 /**

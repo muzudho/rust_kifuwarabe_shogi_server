@@ -24,15 +24,12 @@
 
 #[macro_use]
 extern crate lazy_static;
-//use std::collections::HashMap;
-//use std::collections::VecDeque;
 
 extern crate kifuwarabe_server;
 use kifuwarabe_server::interfaces::*;
 use kifuwarabe_server::*;
 
 mod models;
-//use models::game_summary::*;
 
 extern crate kifuwarabe_shell;
 extern crate serde_json;
@@ -43,7 +40,6 @@ use shell_impl::*;
 mod server_impl;
 use server_impl::*;
 use server_impl::LOBBY;
-//use server_impl::GAME_MAP;
 
 use std::thread;
 use std::time::Duration;
@@ -135,25 +131,27 @@ AGREE"# => {
 /**
  * クライアントのいずれか１つが、サーバーからのメッセージを待っているタイミング。
  */
-fn default_sending(connection_number: i64, _res: &mut Response) {
+fn default_sending(connection_number: i64, res: &mut Response) {
 
     // 2人待っていれば、マッチングしようぜ☆（＾ｑ＾）
     setup_2player_to_match();
     
-        /*
-
+    // クライアントが starting 状態か？
     if is_state(connection_number, "starting") {
+        println!("{} は、startingだ！", connection_number);
+        // 相手が CSAプロトコルと決めつけて ゲームサマリーを送り付ける。
 
+        // クライアントが入っている部屋番号。
+        let game_num = get_room_number_by_player(connection_number);
+        println!("game_num: {}", game_num);
+
+        // メッセージ作成。
+        res.set_message(&get_game_summary_string(game_num));
+
+        // ステータス変更。
+        set_player_state(connection_number, "isAgree");
+        println!("{} のステータスを変更したはず。", connection_number);
     }
-
-            // メッセージ作成。
-            /* TODO             get_game_summary_string()
-            res.set_message(&format!(
-                r#"{}"#,
-                GAME_MAP.try_read().unwrap()[&0].game_summary.to_string_ln()
-            ))
-             */
-        */
 
     /*
     let waiting_player;
