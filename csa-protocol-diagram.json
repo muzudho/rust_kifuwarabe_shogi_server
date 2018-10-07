@@ -1,0 +1,14 @@
+{
+    "entry_point": "incoming",
+    "nodes": [
+        {
+            "label": "incoming",
+            "exit": {
+                "gameSummary": "isAgree",
+            }
+        },
+        {
+            "label": "isAgree",
+        }
+    ]
+}

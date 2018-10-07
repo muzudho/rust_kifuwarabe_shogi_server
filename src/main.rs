@@ -50,7 +50,7 @@ fn main() {
     println!("I am a shogi server!");
 
     // グローバル変数の用意。
-    setup_graph();
+    setup_diagram();
 
     // サーバー構造体に、コールバック関数を登録していけだぜ。
     let server = &Server {

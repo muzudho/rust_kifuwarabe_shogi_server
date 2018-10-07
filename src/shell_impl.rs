@@ -1,9 +1,9 @@
-use kifuwarabe_shell::graph::*;
+use kifuwarabe_shell::diagram::*;
 use kifuwarabe_shell::shell::*;
 
 use server_impl::*;
 
-const GRAPH_JSON_FILE: &str = "graph.json";
+const DIAGRAM_JSON_FILE: &str = "diagram.json";
 
 /// 任意のオブジェクト。
 pub struct ShellVar {
@@ -30,19 +30,19 @@ impl ShellVar {
 use std::sync::RwLock;
 lazy_static! {
     // 一度作ってしまえば、あとは読込のみ。
-    static ref GRAPH: RwLock<Graph<ShellVar>> = RwLock::new(Graph::new());
+    static ref DIAGRAM: RwLock<Diagram<ShellVar>> = RwLock::new(Diagram::new());
 }
 
 /// グラフは１つ作れば、どのクライアントでも使いまわす。
-pub fn setup_graph() {
-    let mut graph = GRAPH.try_write().unwrap();
+pub fn setup_diagram() {
+    let mut diagram = DIAGRAM.try_write().unwrap();
 
     // コントローラー登録。
-    graph.insert_fn("do_player_name", do_player_name);
-    graph.insert_fn("do_password", do_password);
+    diagram.insert_fn("do_player_name", do_player_name);
+    diagram.insert_fn("do_password", do_password);
 
     // ファイル読取。
-    graph.read_graph_file(&GRAPH_JSON_FILE.to_string());
+    diagram.read_file(&DIAGRAM_JSON_FILE.to_string());
 }
 
 // クライアント１つごとに、１つのシェルを割り当てる。
@@ -54,8 +54,8 @@ pub fn execute_line_by_client(connection_number: i64, line: &str) -> String {
     {
         // 実行。グラフと 任意のオブジェクトを渡す。
         let mut shell = Shell::new();
-        let mut graph = GRAPH.try_write().unwrap();
-        shell.execute_line(&mut graph, &mut shell_var, line);
+        let mut diagram = DIAGRAM.try_write().unwrap();
+        shell.execute_line(&mut diagram, &mut shell_var, line);
     }
 
     shell_var.get_flow_message()
