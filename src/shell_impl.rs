@@ -1,7 +1,7 @@
 use kifuwarabe_shell::diagram::*;
 use kifuwarabe_shell::shell::*;
 
-use server_impl::*;
+use server_diagram_impl::*;
 
 const DIAGRAM_JSON_FILE: &str = "diagram.json";
 

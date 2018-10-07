@@ -1,7 +1,8 @@
 use kifuwarabe_server::*;
 use models::game_summary::*;
 use std::collections::HashMap;
-use std::collections::VecDeque;
+use server_controller_impl::LOBBY;
+
 
 const GAME_ID: &str = "20180929-KIFUWARABECUP-0";
 
@@ -21,25 +22,9 @@ impl Game {
     }
 }
 
-/// ロビー。マッチングするためのもの。
-pub struct Lobby {
-    // 余ってるプレイヤー番号。
-    pub waiting_players: VecDeque<i64>,
-}
-impl Lobby {
-    pub fn new() -> Lobby {
-        Lobby {
-            waiting_players: VecDeque::new(),
-        }
-    }
-}
-
 // グローバル変数。
 use std::sync::RwLock;
 lazy_static! {
-    /// サーバーのどこからでも使う。
-    pub static ref LOBBY: RwLock<Lobby> = RwLock::new(Lobby::new());
-
     /// 対局間で共有する。 <対局番号,変数>
     pub static ref GAME_MAP: RwLock<HashMap<i64, Game>> = RwLock::new(HashMap::new());
 }
