@@ -24,14 +24,14 @@ impl Lobby {
 /// 任意のオブジェクト。
 pub struct ShellVar {
     connection_number: i64,
-    /// どのフローが終わったか、識別する文字列。
-    flow_message: String,
+    /// クライアントに送信する文字列。
+    message_to_client: String,
 }
 impl ShellVar {
     pub fn new() -> ShellVar {
         ShellVar {
             connection_number: -1,
-            flow_message: "".to_string(),
+            message_to_client: "".to_string(),
         }
     }
     pub fn get_connection_number(&self) -> i64 {
@@ -40,11 +40,11 @@ impl ShellVar {
     pub fn set_connection_number(&mut self, value:i64){
         self.connection_number = value
     }
-    pub fn get_flow_message(&self) -> String {
-        self.flow_message.to_string()
+    pub fn get_message_to_client(&self) -> String {
+        self.message_to_client.to_string()
     }
-    pub fn set_flow_message(&mut self, value: &str) {
-        self.flow_message = value.to_string();
+    pub fn set_message_to_client(&mut self, value: &str) {
+        self.message_to_client = value.to_string();
     }
 }
 
@@ -111,25 +111,20 @@ pub fn on_receiving_shogi(req: &Request, res: &mut Response) {
                     shell_var.set_connection_number(req.get_connection_number());
 
                     // コマンドラインは、ダイアグラムに従って パースさせるぜ☆（*＾～＾*）
+                    shell_var.set_message_to_client("");
                     {
                         let mut diagram = DIAGRAM.try_write().unwrap();
                         shell.execute_line(&mut diagram, shell_var, &req.get_message());
                     }
 
-                    let flow_message = shell_var.get_flow_message();
+                    let message_to_client = shell_var.get_message_to_client();
 
-                    if &flow_message.to_string() == "loginEnd" {
-                        // 名前とパスワードを分解した。
-
-                        // 応答メッセージ作成。
-                        res.set_message(&format!(
-                            r#"LOGIN:{} OK
-"#, // 改行。
-                            get_player_name(req.get_connection_number())
-                        ));
+                    if &message_to_client.to_string() != "" {
+                        // 応答メッセージ。
+                        res.set_message(&message_to_client);
                     } else {
                         println!(
-                            "<{} Not match: [{}]",
+                            "<{} Nothing response message to client: [{}]",
                             req.get_connection_number(),
                             req.get_message()
                         );
