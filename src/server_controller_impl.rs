@@ -5,6 +5,7 @@ use server_diagram_impl::*;
 use shell_impl::DIAGRAM;
 use std::collections::HashMap;
 use std::collections::VecDeque;
+use models::game::*;
 
 pub const DIAGRAM_JSON_FILE: &str = "diagram.json";
 
@@ -51,14 +52,31 @@ impl ShellVar {
 // グローバル変数。
 use std::sync::RwLock;
 lazy_static! {
-    /// サーバーのどこからでも使う。
+    /// 待機しているプレイヤー番号など。
     pub static ref LOBBY: RwLock<Lobby> = RwLock::new(Lobby::new());
 
-    /// サーバーのどこからでも使う。
+    /// クライアント（接続者番号）に対応づくオブジェクト。
+    
+
+    /// クライアントに対応づく Shell。
     pub static ref SHELL_MAP: RwLock<HashMap<i64,Shell<ShellVar>>> = RwLock::new(HashMap::new());
 
-    /// サーバーのどこからでも使う。
+    /// クライアントに対応づく ShellVar。
     pub static ref SHELL_VAR_MAP: RwLock<HashMap<i64,ShellVar>> = RwLock::new(HashMap::new());
+
+    /// 対局部屋相当。プレイヤー２つが対応付く。
+    pub static ref GAME_MAP: RwLock<HashMap<i64,Game>> = RwLock::new(HashMap::new());
+}
+
+pub struct ServerController {
+
+}
+impl ServerController {
+    pub fn new() -> ServerController {
+        ServerController {
+
+        }
+    }
 }
 
 /// クライアントからの接続があったとき。

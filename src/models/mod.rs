@@ -1,1 +1,2 @@
-pub mod game_summary;
+pub mod game;
+pub mod player;

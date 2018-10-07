@@ -26,7 +26,9 @@ pub fn setup_diagram() {
 /// プレイヤー名を読み取った。
 pub fn do_player_name(shell_var: &mut ShellVar, req: &Request, _res: &mut dyn Response) {
     let player_name = &req.get_groups()[0];
+
     set_player_name(shell_var.get_connection_number(), &player_name);
+    
     println!(
         "<{} do_player_name: {}",
         shell_var.get_connection_number(),
@@ -36,6 +38,9 @@ pub fn do_player_name(shell_var: &mut ShellVar, req: &Request, _res: &mut dyn Re
 }
 
 /// 接続者前とパスワードを分解した。
+/// 
+/// - ログイン完了の通知をクライアントに返す。
+/// - 対局はまだ付いていない。
 pub fn do_password(shell_var: &mut ShellVar, req: &Request, _res: &mut dyn Response) {
     println!(
         "<{} do_password: {}",

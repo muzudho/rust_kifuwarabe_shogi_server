@@ -1,33 +1,13 @@
 use kifuwarabe_server::*;
-use models::game_summary::*;
+use models::game::*;
 use std::collections::HashMap;
+use server_controller_impl::GAME_MAP;
 use server_controller_impl::LOBBY;
 
 
-const GAME_ID: &str = "20180929-KIFUWARABECUP-0";
+/// 試し。
+const GAME_NAME_TAMESI: &str = "20180929-KIFUWARABECUP-0";
 
-/// 対局変数。
-pub struct Game {
-    /// 汎用的に利用できるハッシュマップ。
-    #[allow(dead_code)]
-    pub properties: HashMap<String, String>,
-    pub game_summary: GameSummary,
-}
-impl Game {
-    pub fn new() -> Game {
-        Game {
-            properties: HashMap::new(),
-            game_summary: GameSummary::new(),
-        }
-    }
-}
-
-// グローバル変数。
-use std::sync::RwLock;
-lazy_static! {
-    /// 対局間で共有する。 <対局番号,変数>
-    pub static ref GAME_MAP: RwLock<HashMap<i64, Game>> = RwLock::new(HashMap::new());
-}
 
 pub fn set_player_name(player_num: i64, player_name: &str) {
     CLIENT_MAP
@@ -192,14 +172,14 @@ pub fn create_game(player_num0: i64, player_num1: i64) -> usize {
     {
         // とりあえず、
         println!("ゲームIDセット");
-        game.game_summary.set_game_id(GAME_ID);
+        game.set_name(GAME_NAME_TAMESI.to_string());
 
         println!("名前配列セット");
-        game.game_summary
-            .set_name_arr([player_name0.to_string(), player_name1.to_string()]);
+        game.get_mut_player0().set_name(player_name0.to_string());
+        game.get_mut_player1().set_name(player_name1.to_string());
 
         println!("ターン セット");
-        game.game_summary.set_turn(Turn::Black);
+        game.set_turn(Turn::Black);
 
         {
             println!("部屋番号取得");
@@ -223,6 +203,5 @@ pub fn create_game(player_num0: i64, player_num1: i64) -> usize {
  */
 pub fn get_game_summary_string(game_num: i64) -> String {
     GAME_MAP.try_read().unwrap()[&game_num]
-        .game_summary
-        .to_string_ln()
+        .to_game_summary_string_ln()
 }
