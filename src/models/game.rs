@@ -27,6 +27,11 @@ pub struct Game{
     //#[allow(dead_code)]
     //pub game_summary: GameSummary,
 }
+impl Default for Game {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 impl Game{
     pub fn new() -> Game {
         Game {

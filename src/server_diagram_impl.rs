@@ -1,35 +1,14 @@
 use kifuwarabe_server::*;
 use models::game::*;
-use std::collections::HashMap;
+//use std::collections::HashMap;
 use server_controller_impl::GAME_MAP;
 use server_controller_impl::LOBBY;
+use server_controller_impl::*;
 
 
 /// 試し。
 const GAME_NAME_TAMESI: &str = "20180929-KIFUWARABECUP-0";
 
-
-pub fn set_player_name(player_num: i64, player_name: &str) {
-    CLIENT_MAP
-        .try_write()
-        .unwrap()
-        .get_mut(&player_num)
-        .unwrap()
-        .properties
-        .insert("playerName".to_string(), player_name.to_string());
-}
-
-pub fn get_player_name(player_num: i64) -> String {
-    CLIENT_MAP
-        .try_read()
-        .expect("CLIENT_MAP.try_write()")
-        .get(&player_num)
-        .unwrap()
-        .properties
-        .get("playerName")
-        .unwrap_or(&"playerName not found.".to_string())
-        .to_string()
-}
 
 /// # Returns.
 /// 該当無しなら -1
@@ -161,10 +140,16 @@ pub fn create_game(player_num0: i64, player_num1: i64) -> usize {
     let game_number;
 
     println!("プレイヤーデータ0: {} 取得", player_num0);
-    let player_name0 = get_player_name(player_num0);
+    let player_name0;
+    {
+        player_name0 = PLAYER_MAP.try_read().unwrap().get(&player_num0).unwrap().get_name().to_string();
+    }
 
     println!("プレイヤーデータ1: {} 取得", player_num1);
-    let player_name1 = get_player_name(player_num1);
+    let player_name1;
+    {
+        player_name1 = PLAYER_MAP.try_read().unwrap().get(&player_num1).unwrap().get_name().to_string();
+    }
 
     println!("対局室オブジェクト生成");
     let mut game = Game::new();

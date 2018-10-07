@@ -1,11 +1,11 @@
 use kifuwarabe_server::interfaces::*;
 use kifuwarabe_shell::shell::*;
 use server_diagram_impl::*;
-// use shell_impl::*;
 use shell_impl::DIAGRAM;
 use std::collections::HashMap;
 use std::collections::VecDeque;
 use models::game::*;
+use models::shell_var::*;
 
 pub const DIAGRAM_JSON_FILE: &str = "diagram.json";
 
@@ -22,33 +22,6 @@ impl Lobby {
     }
 }
 
-/// 任意のオブジェクト。
-pub struct ShellVar {
-    connection_number: i64,
-    /// クライアントに送信する文字列。
-    message_to_client: String,
-}
-impl ShellVar {
-    pub fn new() -> ShellVar {
-        ShellVar {
-            connection_number: -1,
-            message_to_client: "".to_string(),
-        }
-    }
-    pub fn get_connection_number(&self) -> i64 {
-        self.connection_number
-    }
-    pub fn set_connection_number(&mut self, value:i64){
-        self.connection_number = value
-    }
-    pub fn get_message_to_client(&self) -> String {
-        self.message_to_client.to_string()
-    }
-    pub fn set_message_to_client(&mut self, value: &str) {
-        self.message_to_client = value.to_string();
-    }
-}
-
 // グローバル変数。
 use std::sync::RwLock;
 lazy_static! {
@@ -56,7 +29,7 @@ lazy_static! {
     pub static ref LOBBY: RwLock<Lobby> = RwLock::new(Lobby::new());
 
     /// クライアント（接続者番号）に対応づくオブジェクト。
-    
+    pub static ref PLAYER_MAP: RwLock<HashMap<i64,Player>> = RwLock::new(HashMap::new());    
 
     /// クライアントに対応づく Shell。
     pub static ref SHELL_MAP: RwLock<HashMap<i64,Shell<ShellVar>>> = RwLock::new(HashMap::new());
@@ -83,6 +56,14 @@ impl ServerController {
 /// 対局待ちキューに、その接続に番号を入れる。
 pub fn on_coming_shogi(connection_number: i64) {
     println!("Welcome {}!", connection_number);
+
+    {
+        // プレイヤー オブジェクトを与えようぜ☆（＾～＾）
+        PLAYER_MAP
+            .try_write()
+            .unwrap()
+            .insert(connection_number, Player::new());
+    }
 
     {
         // シェルを与えようぜ☆（＾～＾）

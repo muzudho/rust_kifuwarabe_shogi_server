@@ -3,12 +3,15 @@ pub struct Player {
     number: i64,
     /// 対局者名。
     name: String,
+    /// ログイン時のパスワード。
+    password: String,
 }
 impl Player {
     pub fn new() -> Player {
         Player {
             number: -1,
             name: "".to_string(),
+            password: "".to_string(),
         }
     }
 
@@ -25,4 +28,12 @@ impl Player {
     pub fn set_name(&mut self, value:String) {
         self.name = value
     }
+
+    pub fn get_password(&self) -> String {
+        self.password.to_string()
+    }
+    pub fn set_password(&mut self, value: &str) {
+        self.password = value.to_string();
+    }
+
 }
