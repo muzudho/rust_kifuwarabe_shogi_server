@@ -1,6 +1,8 @@
 use kifuwarabe_server::interfaces::*;
-use shell_impl::*;
+use kifuwarabe_shell::shell::*;
 use server_diagram_impl::*;
+use shell_impl::*;
+use std::collections::HashMap;
 use std::collections::VecDeque;
 
 /// ロビー。マッチングするためのもの。
@@ -21,13 +23,23 @@ use std::sync::RwLock;
 lazy_static! {
     /// サーバーのどこからでも使う。
     pub static ref LOBBY: RwLock<Lobby> = RwLock::new(Lobby::new());
-}
 
+    /// サーバーのどこからでも使う。
+    pub static ref SHELL_MAP: RwLock<HashMap<i64,Shell<ShellVar>>> = RwLock::new(HashMap::new());
+}
 
 /// クライアントからの接続があったとき。
 /// 対局待ちキューに、その接続に番号を入れる。
 pub fn on_coming_shogi(connection_number: i64) {
     println!("Welcome {}!", connection_number);
+
+    {
+        // シェルを与えようぜ☆（＾～＾）
+        SHELL_MAP
+            .try_write()
+            .unwrap()
+            .insert(connection_number, Shell::new());
+    }
 
     {
         // 待ち行列に追加しようぜ☆（＾ｑ＾）
@@ -43,28 +55,32 @@ pub fn on_coming_shogi(connection_number: i64) {
 pub fn on_receiving_shogi(req: &Request, res: &mut Response) {
     println!("<{} {}", req.get_connection_number(), req.get_message());
 
-    // パースは丸投げ☆（*＾～＾*）
-    let flow_message = execute_line_by_client(req.get_connection_number(), &req.get_message());
+    match SHELL_MAP.try_write().unwrap().get_mut(&req.get_connection_number()) {
+        Some(shell) => {
+            // パースは丸投げ☆（*＾～＾*）
+            let flow_message = execute_line_by_client(shell, req.get_connection_number(), &req.get_message());
 
-    if &flow_message.to_string() == "loginEnd" {
-        // 名前とパスワードを分解した。
+            if &flow_message.to_string() == "loginEnd" {
+                // 名前とパスワードを分解した。
 
-        // 応答メッセージ作成。
-        res.set_message(&format!(
-            r#"LOGIN:{} OK
-"#, // 改行。
-            get_player_name(req.get_connection_number())
-        ));
-
-    } else {
-        println!(
-            "<{} Not match: [{}]",
-            req.get_connection_number(),
-            req.get_message()
-        );
+                // 応答メッセージ作成。
+                res.set_message(&format!(
+                    r#"LOGIN:{} OK
+        "#, // 改行。
+                    get_player_name(req.get_connection_number())
+                ));
+            } else {
+                println!(
+                    "<{} Not match: [{}]",
+                    req.get_connection_number(),
+                    req.get_message()
+                );
+            }
+        }
+        None => panic!("Not found in map.")
     }
 
-/* TODO
+    /* TODO
     match req.get_message() {
         "LOGIN kifuwarabe a" => {
 
@@ -85,10 +101,9 @@ AGREE"# => {
  * クライアントのいずれか１つが、サーバーからのメッセージを待っているタイミング。
  */
 pub fn on_sending_shogi(connection_number: i64, res: &mut Response) {
-
     // 2人待っていれば、マッチングしようぜ☆（＾ｑ＾）
     setup_2player_to_match();
-    
+
     // クライアントが starting 状態か？
     if is_state(connection_number, "starting") {
         println!("{} は、startingだ！", connection_number);
@@ -103,7 +118,10 @@ pub fn on_sending_shogi(connection_number: i64, res: &mut Response) {
 
         // ステータス変更。
         set_player_state(connection_number, "isAgree");
-        println!("{} のステータスを変更したはず。", connection_number);
+        println!(
+            "{} のステータスを変更したはず。",
+            connection_number
+        );
     }
 
     /*

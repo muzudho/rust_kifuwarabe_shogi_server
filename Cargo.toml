@@ -13,7 +13,7 @@ rev = "d07867f5051c84c4ddcc839f7f76585fc1e17e72"
 
 [dependencies.kifuwarabe_shell]
 git = "https://github.com/muzudho/rust_kifuwarabe_shell.git"
-rev = "031cb0f755c464882a5716251741fd1568860717"
+rev = "f1cd2bf0d3f51ed4db334fffe77931d7e760c069"
 
 [dependencies.kifuwarabe_state_transition_diagram]
 git = "https://github.com/muzudho/rust_kifuwarabe_state_transition_diagram.git"

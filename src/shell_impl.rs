@@ -1,6 +1,5 @@
 use kifuwarabe_shell::diagram::*;
 use kifuwarabe_shell::shell::*;
-
 use server_diagram_impl::*;
 
 const DIAGRAM_JSON_FILE: &str = "diagram.json";
@@ -46,14 +45,13 @@ pub fn setup_diagram() {
 }
 
 // クライアント１つごとに、１つのシェルを割り当てる。
-pub fn execute_line_by_client(connection_number: i64, line: &str) -> String {
+pub fn execute_line_by_client(shell:&mut Shell<ShellVar>, connection_number: i64, line: &str) -> String {
     // 任意のオブジェクト。
     let mut shell_var = ShellVar::new();
     shell_var.connection_number = connection_number;
 
     {
         // 実行。グラフと 任意のオブジェクトを渡す。
-        let mut shell = Shell::new();
         let mut diagram = DIAGRAM.try_write().unwrap();
         shell.execute_line(&mut diagram, &mut shell_var, line);
     }
