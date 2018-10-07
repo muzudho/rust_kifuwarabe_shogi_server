@@ -35,35 +35,18 @@ pub fn set_player_to_game_room(player_num: i64, game_number: i64) {
         .insert("gameRoom".to_string(), game_number.to_string());
 }
 
-pub fn set_player_state(player_num: i64, state: &str) {
-    CLIENT_MAP
-        .try_write()
-        .expect("CLIENT_MAP.try_write()")
-        .get_mut(&player_num)
-        .unwrap()
-        .properties
-        .insert("state".to_string(), state.to_string());
-}
-
-/// # Returns.
-/// 該当するものがなかったなら 空文字列。
-pub fn get_state_by_player(player_num: i64) -> String {
-    match CLIENT_MAP
-        .try_read()
-        .expect("CLIENT_MAP.try_read()")
-        .get(&player_num)
-        .unwrap()
-        .properties
-        .get(&"state".to_string()) {
-            Some(n) => {n.to_string()},
-            None => {"".to_string()},
-        }
-}
-
 pub fn is_state(player_num: i64, state: &str) -> bool {
     //println!("is_state: {}. expected: {}.", player_num, state);
 
-    get_state_by_player(player_num) == state
+    // 接続者のステータス。
+    let player_state;
+    {
+        player_state = PLAYER_MAP.try_read().unwrap().get(&player_num).expect("is-state").get_state();
+    }
+
+    // 比較。
+    player_state == state
+
 /*
     match CLIENT_MAP
         .try_read()
@@ -117,14 +100,20 @@ pub fn setup_2player_to_match() {
             player_num0, game_number
         );
         set_player_to_game_room(player_num0, game_number as i64);
-        set_player_state(player_num0, "starting");
+        // 接続者のステータスを設定。
+        {
+            PLAYER_MAP.try_write().unwrap().get_mut(&player_num0).expect("setup-state").set_state(&"starting".to_string());
+        }
 
         println!(
             "プレイヤー1: {} を ゲームルーム {} へ移動。",
             player_num1, game_number
         );
         set_player_to_game_room(player_num1, game_number as i64);
-        set_player_state(player_num1, "starting");
+        // 接続者のステータスを設定。
+        {
+            PLAYER_MAP.try_write().unwrap().get_mut(&player_num1).expect("setup-state").set_state(&"starting".to_string());
+        }
 
         println!("マッチング終わり。");
     }

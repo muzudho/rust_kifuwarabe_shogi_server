@@ -171,8 +171,11 @@ pub fn on_sending_shogi(connection_number: i64, res: &mut Response) {
         // メッセージ作成。
         res.set_message(&get_game_summary_string(game_num));
 
-        // ステータス変更。
-        set_player_state(connection_number, "isAgree");
+        // 接続者のステータス変更。
+        {
+            PLAYER_MAP.try_write().unwrap().get_mut(&connection_number).expect("sending-state").set_state(&"isAgree".to_string());
+        }
+
         println!(
             "{} のステータスを変更したはず。",
             connection_number

@@ -5,6 +5,8 @@ pub struct Player {
     name: String,
     /// ログイン時のパスワード。
     password: String,
+    /// 遷移状態。
+    state: String,
 }
 impl Player {
     pub fn new() -> Player {
@@ -12,6 +14,7 @@ impl Player {
             number: -1,
             name: "".to_string(),
             password: "".to_string(),
+            state: "".to_string(),
         }
     }
 
@@ -34,6 +37,13 @@ impl Player {
     }
     pub fn set_password(&mut self, value: &str) {
         self.password = value.to_string();
+    }
+
+    pub fn get_state(&self) -> String {
+        self.state.to_string()
+    }
+    pub fn set_state(&mut self, value: &str) {
+        self.state = value.to_string();
     }
 
 }
