@@ -18,6 +18,33 @@ impl Lobby {
     }
 }
 
+/// 任意のオブジェクト。
+pub struct ShellVar {
+    connection_number: i64,
+    /// どのフローが終わったか、識別する文字列。
+    flow_message: String,
+}
+impl ShellVar {
+    pub fn new() -> ShellVar {
+        ShellVar {
+            connection_number: -1,
+            flow_message: "".to_string(),
+        }
+    }
+    pub fn get_connection_number(&self) -> i64 {
+        self.connection_number
+    }
+    pub fn set_connection_number(&mut self, value:i64){
+        self.connection_number = value
+    }
+    pub fn get_flow_message(&self) -> String {
+        self.flow_message.to_string()
+    }
+    pub fn set_flow_message(&mut self, value: &str) {
+        self.flow_message = value.to_string();
+    }
+}
+
 // グローバル変数。
 use std::sync::RwLock;
 lazy_static! {
@@ -26,6 +53,9 @@ lazy_static! {
 
     /// サーバーのどこからでも使う。
     pub static ref SHELL_MAP: RwLock<HashMap<i64,Shell<ShellVar>>> = RwLock::new(HashMap::new());
+
+    /// サーバーのどこからでも使う。
+    pub static ref SHELL_VAR_MAP: RwLock<HashMap<i64,ShellVar>> = RwLock::new(HashMap::new());
 }
 
 /// クライアントからの接続があったとき。
@@ -42,6 +72,14 @@ pub fn on_coming_shogi(connection_number: i64) {
     }
 
     {
+        // シェルの内部状態変数を与えようぜ☆（＾～＾）
+        SHELL_VAR_MAP
+            .try_write()
+            .unwrap()
+            .insert(connection_number, ShellVar::new());
+    }
+
+    {
         // 待ち行列に追加しようぜ☆（＾ｑ＾）
         LOBBY
             .try_write()
@@ -55,29 +93,47 @@ pub fn on_coming_shogi(connection_number: i64) {
 pub fn on_receiving_shogi(req: &Request, res: &mut Response) {
     println!("<{} {}", req.get_connection_number(), req.get_message());
 
-    match SHELL_MAP.try_write().unwrap().get_mut(&req.get_connection_number()) {
+    match SHELL_MAP
+        .try_write()
+        .unwrap()
+        .get_mut(&req.get_connection_number())
+    {
         Some(shell) => {
-            // パースは丸投げ☆（*＾～＾*）
-            let flow_message = execute_line_by_client(shell, req.get_connection_number(), &req.get_message());
+            match SHELL_VAR_MAP
+                .try_write()
+                .unwrap()
+                .get_mut(&req.get_connection_number())
+            {
+                Some(shell_var) => {
+                    // パースは丸投げ☆（*＾～＾*）
+                    let flow_message = execute_line_by_client(
+                        shell,
+                        shell_var,
+                        req.get_connection_number(),
+                        &req.get_message(),
+                    );
 
-            if &flow_message.to_string() == "loginEnd" {
-                // 名前とパスワードを分解した。
+                    if &flow_message.to_string() == "loginEnd" {
+                        // 名前とパスワードを分解した。
 
-                // 応答メッセージ作成。
-                res.set_message(&format!(
-                    r#"LOGIN:{} OK
-        "#, // 改行。
-                    get_player_name(req.get_connection_number())
-                ));
-            } else {
-                println!(
-                    "<{} Not match: [{}]",
-                    req.get_connection_number(),
-                    req.get_message()
-                );
+                        // 応答メッセージ作成。
+                        res.set_message(&format!(
+                            r#"LOGIN:{} OK
+"#, // 改行。
+                            get_player_name(req.get_connection_number())
+                        ));
+                    } else {
+                        println!(
+                            "<{} Not match: [{}]",
+                            req.get_connection_number(),
+                            req.get_message()
+                        );
+                    }
+                }
+                None => panic!("Not found in shell var map."),
             }
         }
-        None => panic!("Not found in map.")
+        None => panic!("Not found in shell map."),
     }
 
     /* TODO
