@@ -1,9 +1,12 @@
 use kifuwarabe_server::interfaces::*;
 use kifuwarabe_shell::shell::*;
 use server_diagram_impl::*;
-use shell_impl::*;
+// use shell_impl::*;
+use shell_impl::DIAGRAM;
 use std::collections::HashMap;
 use std::collections::VecDeque;
+
+pub const DIAGRAM_JSON_FILE: &str = "diagram.json";
 
 /// ロビー。マッチングするためのもの。
 pub struct Lobby {
@@ -105,13 +108,15 @@ pub fn on_receiving_shogi(req: &Request, res: &mut Response) {
                 .get_mut(&req.get_connection_number())
             {
                 Some(shell_var) => {
-                    // パースは丸投げ☆（*＾～＾*）
-                    let flow_message = execute_line_by_client(
-                        shell,
-                        shell_var,
-                        req.get_connection_number(),
-                        &req.get_message(),
-                    );
+                    shell_var.set_connection_number(req.get_connection_number());
+
+                    // コマンドラインは、ダイアグラムに従って パースさせるぜ☆（*＾～＾*）
+                    {
+                        let mut diagram = DIAGRAM.try_write().unwrap();
+                        shell.execute_line(&mut diagram, shell_var, &req.get_message());
+                    }
+
+                    let flow_message = shell_var.get_flow_message();
 
                     if &flow_message.to_string() == "loginEnd" {
                         // 名前とパスワードを分解した。
