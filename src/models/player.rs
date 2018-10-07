@@ -7,6 +7,8 @@ pub struct Player {
     password: String,
     /// 遷移状態。
     state: String,
+    /// 参加している対局の番号。
+    entry_game: i64,
 }
 impl Player {
     pub fn new() -> Player {
@@ -15,6 +17,7 @@ impl Player {
             name: "".to_string(),
             password: "".to_string(),
             state: "".to_string(),
+            entry_game: -1,
         }
     }
 
@@ -44,6 +47,13 @@ impl Player {
     }
     pub fn set_state(&mut self, value: &str) {
         self.state = value.to_string();
+    }
+
+    pub fn get_entry_game(&self) -> i64 {
+        self.entry_game
+    }
+    pub fn set_entry_game(&mut self, value:i64) {
+        self.entry_game = value
     }
 
 }

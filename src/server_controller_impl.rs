@@ -164,8 +164,11 @@ pub fn on_sending_shogi(connection_number: i64, res: &mut Response) {
         println!("{} は、startingだ！", connection_number);
         // 相手が CSAプロトコルと決めつけて ゲームサマリーを送り付ける。
 
-        // クライアントが入っている部屋番号。
-        let game_num = get_room_number_by_player(connection_number);
+        // 接続者が入っている部屋番号。
+        let game_num;
+        {
+            game_num = PLAYER_MAP.try_read().unwrap().get(&connection_number).expect("sending-entry-game").get_entry_game();
+        }
         println!("game_num: {}", game_num);
 
         // メッセージ作成。

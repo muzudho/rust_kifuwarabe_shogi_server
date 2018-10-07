@@ -10,31 +10,6 @@ use server_controller_impl::*;
 const GAME_NAME_TAMESI: &str = "20180929-KIFUWARABECUP-0";
 
 
-/// # Returns.
-/// 該当無しなら -1
-pub fn get_room_number_by_player(player_num: i64) -> i64 {
-    match CLIENT_MAP
-        .try_read()
-        .expect("CLIENT_MAP.try_read()")
-        .get(&player_num)
-        .unwrap()
-        .properties
-        .get(&"gameRoom".to_string()) {
-            Some(text) => text.parse().unwrap(),
-            None => -1,
-        }
-}
-
-pub fn set_player_to_game_room(player_num: i64, game_number: i64) {
-    CLIENT_MAP
-        .try_write()
-        .expect("CLIENT_MAP.try_write()")
-        .get_mut(&player_num)
-        .unwrap()
-        .properties
-        .insert("gameRoom".to_string(), game_number.to_string());
-}
-
 pub fn is_state(player_num: i64, state: &str) -> bool {
     //println!("is_state: {}. expected: {}.", player_num, state);
 
@@ -99,7 +74,11 @@ pub fn setup_2player_to_match() {
             "プレイヤー0: {} を ゲームルーム {} へ移動。",
             player_num0, game_number
         );
-        set_player_to_game_room(player_num0, game_number as i64);
+
+        // ゲーム部屋番号を設定。
+        {
+            PLAYER_MAP.try_write().unwrap().get_mut(&player_num0).expect("setup-p0-entry-game").set_entry_game(game_number as i64);
+        }
         // 接続者のステータスを設定。
         {
             PLAYER_MAP.try_write().unwrap().get_mut(&player_num0).expect("setup-state").set_state(&"starting".to_string());
@@ -109,7 +88,10 @@ pub fn setup_2player_to_match() {
             "プレイヤー1: {} を ゲームルーム {} へ移動。",
             player_num1, game_number
         );
-        set_player_to_game_room(player_num1, game_number as i64);
+        // ゲーム部屋番号を設定。
+        {
+            PLAYER_MAP.try_write().unwrap().get_mut(&player_num1).expect("setup-p1-entry-game").set_entry_game(game_number as i64);
+        }
         // 接続者のステータスを設定。
         {
             PLAYER_MAP.try_write().unwrap().get_mut(&player_num1).expect("setup-state").set_state(&"starting".to_string());
