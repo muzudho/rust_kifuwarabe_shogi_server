@@ -34,9 +34,12 @@
 			"fn": "do_password",
 			"exit": {
 				"#next": [
-					"ND.c"
+					"HEAD.agree"
 				]
 			}
+		},
+		{
+			"label": "HEAD.agree"
 		}
     ]
 }

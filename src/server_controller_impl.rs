@@ -6,7 +6,7 @@ use shell_impl::DIAGRAM;
 use std::collections::HashMap;
 use std::collections::VecDeque;
 use utils::game_utils::*;
-use utils::lobby_utils::*;
+use utils::player_map_utils::*;
 use utils::player_utils::*;
 use utils::shell_map_utils::*;
 use utils::shell_var_utils::*;
@@ -58,13 +58,8 @@ impl ServerController {
 pub fn on_coming_shogi(connection_number: i64) {
     println!("Welcome {}!", connection_number);
 
-    {
-        // プレイヤー オブジェクトを与えようぜ☆（＾～＾）
-        PLAYER_MAP
-            .try_write()
-            .unwrap()
-            .insert(connection_number, Player::new());
-    }
+    // プレイヤー オブジェクトを与えようぜ☆（＾～＾）
+    PlayerMapUtil::insert(connection_number, Player::new());
 
     // シェルを与えようぜ☆（＾～＾）
     ShellMapUtils::insert(connection_number, Shell::new());
@@ -72,8 +67,7 @@ pub fn on_coming_shogi(connection_number: i64) {
     // シェルの内部状態変数を与えようぜ☆（＾～＾）
     ShellVarUtil::insert(connection_number, ShellVar::new());
 
-    // 待ち行列に追加しようぜ☆（＾ｑ＾）
-    LobbyUtil::push_player(connection_number);
+    // まだ接続しただけで、ログインはしてないぜ☆（＾～＾）
 }
 
 /// クライアントからの入力は このメソッド内で処理する。
@@ -98,6 +92,9 @@ pub fn on_receiving_shogi(req: &Request, res: &mut Response) {
                     shell_var.set_message_to_client("");
                     {
                         let mut diagram = DIAGRAM.try_write().unwrap();
+                        // ********************************************************************************
+                        // * コマンドライン解析。                                                           *
+                        // ********************************************************************************
                         shell.execute_line(&mut diagram, shell_var, &req.get_message());
                     }
 
@@ -150,29 +147,14 @@ pub fn on_sending_shogi(connection_number: i64, res: &mut Response) {
         // 相手が CSAプロトコルと決めつけて ゲームサマリーを送り付ける。
 
         // 接続者が入っている部屋番号。
-        let game_num;
-        {
-            game_num = PLAYER_MAP
-                .try_read()
-                .unwrap()
-                .get(&connection_number)
-                .expect("sending-entry-game")
-                .get_entry_game();
-        }
+        let game_num = PlayerMapUtil::get_entry_game(connection_number);
         println!("game_num: {}", game_num);
 
         // メッセージ作成。
         res.set_message(&GameUtil::get_game_summary_string(game_num));
 
         // 接続者のステータス変更。
-        {
-            PLAYER_MAP
-                .try_write()
-                .unwrap()
-                .get_mut(&connection_number)
-                .expect("sending-state")
-                .set_state(&"isAgree".to_string());
-        }
+        PlayerMapUtil::set_state(connection_number, &"isAgree".to_string());
 
         println!(
             "{} のステータスを変更したはず。",
@@ -180,15 +162,5 @@ pub fn on_sending_shogi(connection_number: i64, res: &mut Response) {
         );
     }
 
-    /*
-    let waiting_player;
-    if -1!=waiting_player {
-        // 誰かが待機中。
-        // マッチングが成立。
-        println!("Match {} vs {}!", connection_number, waiting_player);
-    } else {
-        // 自分が待機になる。
-        LOBBY.try_write().unwrap().waiting_player = connection_number;
-    }
-     */
+    // TODO クライアントに AGREE を送りたい？
 }
