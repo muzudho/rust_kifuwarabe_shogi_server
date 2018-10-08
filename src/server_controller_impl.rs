@@ -162,7 +162,7 @@ pub fn on_sending_shogi(connection_number: i64, res: &mut Response) {
     setup_2player_to_match();
 
     // クライアントが starting 状態か？
-    if is_state(connection_number, "starting") {
+    if PlayerUtil::is_state(connection_number, "starting") {
         println!("{} は、startingだ！", connection_number);
         // 相手が CSAプロトコルと決めつけて ゲームサマリーを送り付ける。
 
