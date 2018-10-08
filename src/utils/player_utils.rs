@@ -3,13 +3,30 @@ use server_controller_impl::*;
 
 pub struct PlayerUtil {}
 impl PlayerUtil {
+    pub fn get_name(player_num: i64) -> String {
+        PLAYER_MAP
+            .try_read()
+            .unwrap()
+            .get(&player_num)
+            .unwrap()
+            .get_name()
+            .to_string()
+    }
     pub fn set_game(player_num: i64, game_num: i64) {
         PLAYER_MAP
             .try_write()
             .unwrap()
             .get_mut(&player_num)
-            .expect("setup-p0-entry-game")
+            .expect("player-set-game")
             .set_entry_game(game_num)
+    }
+    pub fn set_state(player_num: i64, status: &str) {
+        PLAYER_MAP
+            .try_write()
+            .unwrap()
+            .get_mut(&player_num)
+            .expect("player-set-state")
+            .set_state(&status.to_string());
     }
     pub fn is_state(player_num: i64, state: &str) -> bool {
         //println!("is_state: {}. expected: {}.", player_num, state);

@@ -159,7 +159,7 @@ AGREE"# => {
  */
 pub fn on_sending_shogi(connection_number: i64, res: &mut Response) {
     // 2人待っていれば、マッチングしようぜ☆（＾ｑ＾）
-    setup_2player_to_match();
+    SomeUtil::setup_2player_to_match();
 
     // クライアントが starting 状態か？
     if PlayerUtil::is_state(connection_number, "starting") {
@@ -174,7 +174,7 @@ pub fn on_sending_shogi(connection_number: i64, res: &mut Response) {
         println!("game_num: {}", game_num);
 
         // メッセージ作成。
-        res.set_message(&get_game_summary_string(game_num));
+        res.set_message(&GameUtil::get_game_summary_string(game_num));
 
         // 接続者のステータス変更。
         {
