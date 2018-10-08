@@ -9,6 +9,14 @@ impl LobbyUtil{
         1 < LOBBY.try_read().unwrap().waiting_players.len()
     }
 
+    /// キューにプレイヤーを突っ込む。
+    pub fn push_player(connection_number: i64) {
+        LOBBY
+            .try_write()
+            .unwrap()
+            .waiting_players
+            .push_back(connection_number);
+    }
     /// キューから先頭の１人を取り出す。
     pub fn pop_player() -> i64 {
         LOBBY

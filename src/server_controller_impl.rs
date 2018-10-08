@@ -1,12 +1,15 @@
 use kifuwarabe_server::interfaces::*;
 use kifuwarabe_shell::shell::*;
+use models::game::*;
+use models::shell_var::*;
 use shell_impl::DIAGRAM;
 use std::collections::HashMap;
 use std::collections::VecDeque;
-use models::game::*;
-use models::shell_var::*;
 use utils::game_utils::*;
+use utils::lobby_utils::*;
 use utils::player_utils::*;
+use utils::shell_map_utils::*;
+use utils::shell_var_utils::*;
 use utils::some_utils::*;
 
 pub const DIAGRAM_JSON_FILE: &str = "diagram.json";
@@ -31,7 +34,7 @@ lazy_static! {
     pub static ref LOBBY: RwLock<Lobby> = RwLock::new(Lobby::new());
 
     /// クライアント（接続者番号）に対応づくオブジェクト。
-    pub static ref PLAYER_MAP: RwLock<HashMap<i64,Player>> = RwLock::new(HashMap::new());    
+    pub static ref PLAYER_MAP: RwLock<HashMap<i64,Player>> = RwLock::new(HashMap::new());
 
     /// クライアントに対応づく Shell。
     pub static ref SHELL_MAP: RwLock<HashMap<i64,Shell<ShellVar>>> = RwLock::new(HashMap::new());
@@ -43,14 +46,10 @@ lazy_static! {
     pub static ref GAME_MAP: RwLock<HashMap<i64,Game>> = RwLock::new(HashMap::new());
 }
 
-pub struct ServerController {
-
-}
+pub struct ServerController {}
 impl ServerController {
     pub fn new() -> ServerController {
-        ServerController {
-
-        }
+        ServerController {}
     }
 }
 
@@ -67,30 +66,14 @@ pub fn on_coming_shogi(connection_number: i64) {
             .insert(connection_number, Player::new());
     }
 
-    {
-        // シェルを与えようぜ☆（＾～＾）
-        SHELL_MAP
-            .try_write()
-            .unwrap()
-            .insert(connection_number, Shell::new());
-    }
+    // シェルを与えようぜ☆（＾～＾）
+    ShellMapUtils::insert(connection_number, Shell::new());
 
-    {
-        // シェルの内部状態変数を与えようぜ☆（＾～＾）
-        SHELL_VAR_MAP
-            .try_write()
-            .unwrap()
-            .insert(connection_number, ShellVar::new());
-    }
+    // シェルの内部状態変数を与えようぜ☆（＾～＾）
+    ShellVarUtil::insert(connection_number, ShellVar::new());
 
-    {
-        // 待ち行列に追加しようぜ☆（＾ｑ＾）
-        LOBBY
-            .try_write()
-            .unwrap()
-            .waiting_players
-            .push_back(connection_number);
-    }
+    // 待ち行列に追加しようぜ☆（＾ｑ＾）
+    LobbyUtil::push_player(connection_number);
 }
 
 /// クライアントからの入力は このメソッド内で処理する。
@@ -169,7 +152,12 @@ pub fn on_sending_shogi(connection_number: i64, res: &mut Response) {
         // 接続者が入っている部屋番号。
         let game_num;
         {
-            game_num = PLAYER_MAP.try_read().unwrap().get(&connection_number).expect("sending-entry-game").get_entry_game();
+            game_num = PLAYER_MAP
+                .try_read()
+                .unwrap()
+                .get(&connection_number)
+                .expect("sending-entry-game")
+                .get_entry_game();
         }
         println!("game_num: {}", game_num);
 
@@ -178,7 +166,12 @@ pub fn on_sending_shogi(connection_number: i64, res: &mut Response) {
 
         // 接続者のステータス変更。
         {
-            PLAYER_MAP.try_write().unwrap().get_mut(&connection_number).expect("sending-state").set_state(&"isAgree".to_string());
+            PLAYER_MAP
+                .try_write()
+                .unwrap()
+                .get_mut(&connection_number)
+                .expect("sending-state")
+                .set_state(&"isAgree".to_string());
         }
 
         println!(
