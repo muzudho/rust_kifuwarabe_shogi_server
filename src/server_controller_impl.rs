@@ -1,11 +1,13 @@
 use kifuwarabe_server::interfaces::*;
 use kifuwarabe_shell::shell::*;
-use server_diagram_impl::*;
 use shell_impl::DIAGRAM;
 use std::collections::HashMap;
 use std::collections::VecDeque;
 use models::game::*;
 use models::shell_var::*;
+use utils::game_utils::*;
+use utils::player_utils::*;
+use utils::some_utils::*;
 
 pub const DIAGRAM_JSON_FILE: &str = "diagram.json";
 

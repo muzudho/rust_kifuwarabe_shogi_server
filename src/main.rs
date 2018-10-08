@@ -29,6 +29,7 @@ extern crate kifuwarabe_server;
 use kifuwarabe_server::*;
 
 mod models;
+mod utils;
 
 extern crate kifuwarabe_shell;
 extern crate serde_json;
@@ -38,8 +39,6 @@ use shell_impl::*;
 
 pub mod server_controller_impl;
 use server_controller_impl::*;
-
-mod server_diagram_impl;
 
 use std::thread;
 use std::time::Duration;

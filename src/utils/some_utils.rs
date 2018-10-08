@@ -1,6 +1,5 @@
-use kifuwarabe_server::*;
+//use kifuwarabe_server::*;
 use models::game::*;
-//use std::collections::HashMap;
 use server_controller_impl::GAME_MAP;
 use server_controller_impl::LOBBY;
 use server_controller_impl::*;
@@ -10,39 +9,6 @@ use server_controller_impl::*;
 const GAME_NAME_TAMESI: &str = "20180929-KIFUWARABECUP-0";
 
 
-pub fn is_state(player_num: i64, state: &str) -> bool {
-    //println!("is_state: {}. expected: {}.", player_num, state);
-
-    // 接続者のステータス。
-    let player_state;
-    {
-        player_state = PLAYER_MAP.try_read().unwrap().get(&player_num).expect("is-state").get_state();
-    }
-
-    // 比較。
-    player_state == state
-
-/*
-    match CLIENT_MAP
-        .try_read()
-        .expect("CLIENT_MAP.try_read()")
-        .get(&player_num)
-        .unwrap()
-        .properties
-        .get(&state.to_string()) {
-            Some(n) => {state == n},
-            None => {false},
-        }
- */
-    /*
-    state == CLIENT_MAP
-        .try_read()
-        .expect("CLIENT_MAP.try_read()")
-        .get(&player_num)
-        .unwrap()
-        .properties[&state.to_string()]
-    */
-}
 
 /**
  * 2人待っていれば、マッチングしようぜ☆（＾ｑ＾）
@@ -152,12 +118,4 @@ pub fn create_game(player_num0: i64, player_num1: i64) -> usize {
     }
 
     game_number
-}
-
-/**
- * メッセージ作成。
- */
-pub fn get_game_summary_string(game_num: i64) -> String {
-    GAME_MAP.try_read().unwrap()[&game_num]
-        .to_game_summary_string_ln()
 }
