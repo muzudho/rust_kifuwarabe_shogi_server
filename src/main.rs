@@ -38,6 +38,9 @@ extern crate serde_json;
 mod shell_impl;
 use shell_impl::*;
 
+mod server_impl;
+use server_impl::*;
+
 pub mod client_handle_impl;
 use client_handle_impl::*;
 
@@ -64,6 +67,7 @@ fn main() {
 
     loop {
         // 
+        loop_server();
 
         thread::sleep(Duration::from_millis(1));
     }

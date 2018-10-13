@@ -10,8 +10,6 @@ use utils::player_map_utils::*;
 use utils::player_utils::*;
 use utils::shell_map_utils::*;
 use utils::shell_var_utils::*;
-use details;
-//use details::client_handle_impl_detail::*;
 
 pub const DIAGRAM_JSON_FILE: &str = "diagram.json";
 
@@ -140,9 +138,6 @@ AGREE"# => {
 /// クライアント１つに対応づく。
 /// クライアントのいずれか１つが、サーバーからのメッセージを待っているタイミング。
 pub fn on_send_to_client_shogi(connection_number: i64, res: &mut Response) {
-
-    // 2人待っていれば、マッチングしようぜ☆（＾ｑ＾）
-    details::client_handle_impl_detail::setup_2player_to_match();
 
     // クライアントが starting 状態か？
     if PlayerUtil::is_state(connection_number, "starting") {
