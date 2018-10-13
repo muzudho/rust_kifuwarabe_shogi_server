@@ -4,4 +4,3 @@ pub mod player_map_utils;
 pub mod player_utils;
 pub mod shell_map_utils;
 pub mod shell_var_utils;
-pub mod some_utils;

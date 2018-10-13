@@ -1,6 +1,6 @@
 use kifuwarabe_shell::diagram::*;
 //use kifuwarabe_shell::shell::*;
-use server_controller_impl::*;
+use client_handle_impl::*;
 //use server_diagram_impl::*;
 use models::shell_var::*;
 use utils::lobby_utils::*;
@@ -40,7 +40,6 @@ pub fn do_player_name(shell_var: &mut ShellVar, req: &Request, _res: &mut dyn Re
         connection_num,
         player_name
     );
-    // res.forward("#next");
 }
 
 /// 接続者前とパスワードを分解した。
@@ -79,5 +78,4 @@ pub fn do_password(shell_var: &mut ShellVar, req: &Request, _res: &mut dyn Respo
 "#, // 改行。
         player_name
     ));
-    // res.forward("#next");
 }

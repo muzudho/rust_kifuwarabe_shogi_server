@@ -1,5 +1,5 @@
 use models::player::Player;
-use server_controller_impl::PLAYER_MAP;
+use client_handle_impl::PLAYER_MAP;
 
 pub struct PlayerMapUtil {}
 impl PlayerMapUtil {

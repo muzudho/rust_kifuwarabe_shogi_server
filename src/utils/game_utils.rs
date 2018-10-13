@@ -1,8 +1,8 @@
 //use kifuwarabe_server::*;
 use models::game::*;
-use server_controller_impl::GAME_MAP;
-//use server_controller_impl::LOBBY;
-//use server_controller_impl::*;
+use client_handle_impl::GAME_MAP;
+//use client_handle_impl::LOBBY;
+//use client_handle_impl::*;
 
 pub struct GameUtil {}
 impl GameUtil {

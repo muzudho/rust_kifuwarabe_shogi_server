@@ -1,4 +1,4 @@
-use server_controller_impl::LOBBY;
+use client_handle_impl::LOBBY;
 
 pub struct LobbyUtil {
 

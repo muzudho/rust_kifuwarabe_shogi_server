@@ -1,5 +1,5 @@
 //use kifuwarabe_server::*;
-use server_controller_impl::*;
+use client_handle_impl::*;
 
 pub struct PlayerUtil {}
 impl PlayerUtil {

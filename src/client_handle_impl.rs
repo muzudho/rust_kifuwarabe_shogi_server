@@ -10,7 +10,8 @@ use utils::player_map_utils::*;
 use utils::player_utils::*;
 use utils::shell_map_utils::*;
 use utils::shell_var_utils::*;
-use utils::some_utils::*;
+use details;
+//use details::client_handle_impl_detail::*;
 
 pub const DIAGRAM_JSON_FILE: &str = "diagram.json";
 
@@ -53,6 +54,7 @@ impl ServerController {
     }
 }
 
+/// クライアント１つに対応づく。
 /// クライアントからの接続があったとき。
 /// 対局待ちキューに、その接続に番号を入れる。
 pub fn on_coming_shogi(connection_number: i64) {
@@ -70,8 +72,9 @@ pub fn on_coming_shogi(connection_number: i64) {
     // まだ接続しただけで、ログインはしてないぜ☆（＾～＾）
 }
 
+/// クライアント１つに対応づく。
 /// クライアントからの入力は このメソッド内で処理する。
-pub fn on_receiving_shogi(req: &Request, res: &mut Response) {
+pub fn on_received_from_client_shogi(req: &Request, res: &mut Response) {
     println!("<{} {}", req.get_connection_number(), req.get_message());
 
     match SHELL_MAP
@@ -134,12 +137,12 @@ AGREE"# => {
 */
 }
 
-/**
- * クライアントのいずれか１つが、サーバーからのメッセージを待っているタイミング。
- */
-pub fn on_sending_shogi(connection_number: i64, res: &mut Response) {
+/// クライアント１つに対応づく。
+/// クライアントのいずれか１つが、サーバーからのメッセージを待っているタイミング。
+pub fn on_send_to_client_shogi(connection_number: i64, res: &mut Response) {
+
     // 2人待っていれば、マッチングしようぜ☆（＾ｑ＾）
-    SomeUtil::setup_2player_to_match();
+    details::client_handle_impl_detail::setup_2player_to_match();
 
     // クライアントが starting 状態か？
     if PlayerUtil::is_state(connection_number, "starting") {

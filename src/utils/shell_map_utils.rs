@@ -1,5 +1,5 @@
 use kifuwarabe_shell::shell::*;
-use server_controller_impl::SHELL_MAP;
+use client_handle_impl::SHELL_MAP;
 use models::shell_var::*;
 
 pub struct ShellMapUtils {}

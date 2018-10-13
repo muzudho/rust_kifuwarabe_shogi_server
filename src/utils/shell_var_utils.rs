@@ -1,4 +1,4 @@
-use server_controller_impl::SHELL_VAR_MAP;
+use client_handle_impl::SHELL_VAR_MAP;
 use models::shell_var::*;
 
 pub struct ShellVarUtil {}

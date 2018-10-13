@@ -28,6 +28,7 @@ extern crate lazy_static;
 extern crate kifuwarabe_server;
 use kifuwarabe_server::*;
 
+mod details;
 mod models;
 mod utils;
 
@@ -37,8 +38,8 @@ extern crate serde_json;
 mod shell_impl;
 use shell_impl::*;
 
-pub mod server_controller_impl;
-use server_controller_impl::*;
+pub mod client_handle_impl;
+use client_handle_impl::*;
 
 use std::thread;
 use std::time::Duration;
@@ -54,14 +55,16 @@ fn main() {
     // サーバー構造体に、コールバック関数を登録していけだぜ。
     let server = &Server {
         on_coming: on_coming_shogi,
-        on_receiving: on_receiving_shogi,
-        on_sending: on_sending_shogi,
+        on_received_from_client: on_received_from_client_shogi,
+        on_send_to_client: on_send_to_client_shogi,
     };
 
     // 静的に、受信ポートを開いて待機。
     listen_incoming(&server, CONNECTION_STRING);
 
     loop {
+        // 
+
         thread::sleep(Duration::from_millis(1));
     }
     // サーバーは、[Ctrl]+[C]キーで強制終了しろだぜ☆（＾～＾）
