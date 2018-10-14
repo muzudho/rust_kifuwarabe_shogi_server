@@ -82,6 +82,11 @@ pub fn on_received_from_client_shogi(req: &Request, res: &mut Response) {
         .get_mut(&req.get_connection_number())
     {
         Some(shell) => {
+            println!(
+                "client_handle_impl.rs/on_received_from_client_shogi/shell current [{}]",
+                shell.get_current()
+            );
+
             match SHELL_VAR_MAP
                 .try_write()
                 .unwrap()
@@ -140,7 +145,8 @@ AGREE"# => {
 /// クライアントのいずれか１つが、サーバーからのメッセージを待っているタイミング。
 pub fn on_send_to_client_shogi(connection_number: i64, res: &mut Response) {
 
-    // クライアントが starting 状態か？
+    /*
+    // TODO クライアントが starting 状態か？
     if PlayerUtil::is_state(connection_number, "starting") {
         println!("{} は、startingだ！", connection_number);
         // 相手が CSAプロトコルと決めつけて ゲームサマリーを送り付ける。
@@ -160,6 +166,7 @@ pub fn on_send_to_client_shogi(connection_number: i64, res: &mut Response) {
             connection_number
         );
     }
+    */
 
     // TODO クライアントに AGREE を送りたい？
 }

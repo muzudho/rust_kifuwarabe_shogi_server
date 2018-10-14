@@ -40,7 +40,7 @@ pub fn setup_2player_to_match() {
         println!("player0 current [{}]", ShellMapUtils::get_current(player_num0));
         // ShellMapUtils::forward(player_num0, &diagram, "matching");
         // 接続者のステータスを設定。
-        PlayerUtil::set_state(player_num0, &"starting".to_string());
+        // TODO PlayerUtil::set_state(player_num0, &"starting".to_string());
 
         println!(
             "プレイヤー1: {} を ゲームルーム {} へ移動。",
@@ -52,7 +52,7 @@ pub fn setup_2player_to_match() {
         println!("player1 current [{}]", ShellMapUtils::get_current(player_num1));
         // ShellMapUtils::forward(player_num1, &diagram, "matching");
         // 接続者のステータスを設定。
-        PlayerUtil::set_state(player_num1, &"starting".to_string());
+        // TODO PlayerUtil::set_state(player_num1, &"starting".to_string());
 
         println!("マッチング終わり。");
     }
