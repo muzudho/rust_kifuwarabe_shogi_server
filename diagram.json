@@ -33,6 +33,14 @@
 			"regex": "([^\\s]+)",
 			"fn": "do_password",
 			"exit": {
+				"#newline": [
+					"login.TAIL"
+				]
+			}
+		},
+		{
+			"label": "login.TAIL",
+			"exit": {
 				"#next": [
 					"WAIT-FOR.matching"
 				]
