@@ -1,7 +1,5 @@
 use kifuwarabe_shell::diagram::*;
-//use kifuwarabe_shell::shell::*;
 use client_handle_impl::*;
-//use server_diagram_impl::*;
 use models::shell_var::*;
 use utils::lobby_utils::*;
 use utils::player_map_utils::*;

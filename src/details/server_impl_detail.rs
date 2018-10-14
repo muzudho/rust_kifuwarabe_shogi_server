@@ -3,6 +3,8 @@ use client_handle_impl::GAME_MAP;
 use utils::game_utils::*;
 use utils::lobby_utils::*;
 use utils::player_utils::*;
+use utils::shell_map_utils::*;
+use shell_impl::DIAGRAM;
 
 /// 試し。
 const GAME_NAME_TAMESI: &str = "20180929-KIFUWARABECUP-0";
@@ -29,9 +31,14 @@ pub fn setup_2player_to_match() {
             player_num0, game_number
         );
 
+        // ダイアグラムを取得。
+        let diagram = DIAGRAM.try_read().expect("server_impl_detail.rs/setup_2player_to_match");
+
         // ゲーム部屋番号を設定。
         PlayerUtil::set_game(player_num0, game_number as i64);
         // TODO 接続者のステートを遷移。
+        println!("player0 current [{}]", ShellMapUtils::get_current(player_num0));
+        // ShellMapUtils::forward(player_num0, &diagram, "matching");
         // 接続者のステータスを設定。
         PlayerUtil::set_state(player_num0, &"starting".to_string());
 
@@ -41,6 +48,9 @@ pub fn setup_2player_to_match() {
         );
         // ゲーム部屋番号を設定。
         PlayerUtil::set_game(player_num1, game_number as i64);
+        // TODO 接続者のステートを遷移。
+        println!("player1 current [{}]", ShellMapUtils::get_current(player_num1));
+        // ShellMapUtils::forward(player_num1, &diagram, "matching");
         // 接続者のステータスを設定。
         PlayerUtil::set_state(player_num1, &"starting".to_string());
 

@@ -41,7 +41,7 @@
 		{
 			"label": "WAIT-FOR.matching",
 			"exit": {
-				"#next": [
+				"matching": [
 					"HEAD.agree"
 				]
 			}

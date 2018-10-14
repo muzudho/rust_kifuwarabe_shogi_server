@@ -14,6 +14,7 @@ use utils::shell_var_utils::*;
 pub const DIAGRAM_JSON_FILE: &str = "diagram.json";
 
 /// ロビー。マッチングするためのもの。
+#[derive(Default)]
 pub struct Lobby {
     // 余ってるプレイヤー番号。
     pub waiting_players: VecDeque<i64>,
@@ -45,6 +46,7 @@ lazy_static! {
     pub static ref GAME_MAP: RwLock<HashMap<i64,Game>> = RwLock::new(HashMap::new());
 }
 
+#[derive(Default)]
 pub struct ServerController {}
 impl ServerController {
     pub fn new() -> ServerController {

@@ -1,3 +1,4 @@
+#[derive(Default)]
 pub struct Player {
     /// 接続者番号。
     number: i64,
