@@ -6,7 +6,6 @@ use shell_impl::DIAGRAM;
 use std::collections::HashMap;
 use std::collections::VecDeque;
 use utils::game_utils::*;
-use utils::player_map_utils::*;
 use utils::player_utils::*;
 use utils::shell_map_utils::*;
 use utils::shell_var_utils::*;
@@ -36,7 +35,7 @@ lazy_static! {
     /// クライアント（接続者番号）に対応づくオブジェクト。
     pub static ref PLAYER_MAP: RwLock<HashMap<i64,Player>> = RwLock::new(HashMap::new());
 
-    /// クライアントに対応づく Shell。
+    /// <ShellVar>型引数が付くので、 PLAYER_MAP とは分けている。
     pub static ref SHELL_MAP: RwLock<HashMap<i64,Shell<ShellVar>>> = RwLock::new(HashMap::new());
 
     /// クライアントに対応づく ShellVar。
@@ -61,7 +60,7 @@ pub fn on_coming_shogi(connection_number: i64) {
     println!("Welcome {}!", connection_number);
 
     // プレイヤー オブジェクトを与えようぜ☆（＾～＾）
-    PlayerMapUtil::insert(connection_number, Player::new());
+    PlayerUtil::insert(connection_number, Player::new());
 
     // シェルを与えようぜ☆（＾～＾）
     ShellMapUtils::insert(connection_number, Shell::new());
@@ -147,14 +146,14 @@ pub fn on_send_to_client_shogi(connection_number: i64, res: &mut Response) {
         // 相手が CSAプロトコルと決めつけて ゲームサマリーを送り付ける。
 
         // 接続者が入っている部屋番号。
-        let game_num = PlayerMapUtil::get_entry_game(connection_number);
+        let game_num = PlayerUtil::get_entry_game(connection_number);
         println!("game_num: {}", game_num);
 
         // メッセージ作成。
         res.set_message(&GameUtil::get_game_summary_string(game_num));
 
         // 接続者のステータス変更。
-        PlayerMapUtil::set_state(connection_number, &"isAgree".to_string());
+        PlayerUtil::set_state(connection_number, &"isAgree".to_string());
 
         println!(
             "{} のステータスを変更したはず。",

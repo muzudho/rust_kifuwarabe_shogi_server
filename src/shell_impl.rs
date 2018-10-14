@@ -2,7 +2,7 @@ use kifuwarabe_shell::diagram::*;
 use client_handle_impl::*;
 use models::shell_var::*;
 use utils::lobby_utils::*;
-use utils::player_map_utils::*;
+use utils::player_utils::*;
 
 // グローバル変数。
 use std::sync::RwLock;
@@ -31,7 +31,7 @@ pub fn do_player_name(shell_var: &mut ShellVar, req: &Request, _res: &mut dyn Re
     let player_name = &req.get_groups()[0];
 
     // 接続者のログイン名を記録。
-    PlayerMapUtil::set_name(connection_num, &player_name.to_string());
+    PlayerUtil::set_name(connection_num, &player_name.to_string());
 
     println!(
         "<{} do_player_name: {}",
@@ -54,7 +54,7 @@ pub fn do_password(shell_var: &mut ShellVar, req: &Request, _res: &mut dyn Respo
     );
 
     // 接続者のパスワードを記録。
-    PlayerMapUtil::set_password(connection_num, &req.get_groups()[0]);
+    PlayerUtil::set_password(connection_num, &req.get_groups()[0]);
 
     // TODO パスワードのチェック。
 
