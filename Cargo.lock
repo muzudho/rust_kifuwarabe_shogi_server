@@ -27,7 +27,7 @@ dependencies = [
 [[package]]
 name = "kifuwarabe_shell"
 version = "1.0.0"
-source = "git+https://github.com/muzudho/rust_kifuwarabe_shell.git?rev=c9b46b56d184f692b530f5413d46d6458def98db#c9b46b56d184f692b530f5413d46d6458def98db"
+source = "git+https://github.com/muzudho/rust_kifuwarabe_shell.git?rev=270b39d1a24e6254227985b624154b3ea4430079#270b39d1a24e6254227985b624154b3ea4430079"
 dependencies = [
  "regex 1.0.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.79 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -108,7 +108,7 @@ name = "rust_kifuwarabe_shogi_server"
 version = "0.1.0"
 dependencies = [
  "kifuwarabe_server 0.1.0 (git+https://github.com/muzudho/rust_kifuwarabe_server.git?rev=418539a79d68a5e7abd2fa5e4cca91efe38aa2ea)",
- "kifuwarabe_shell 1.0.0 (git+https://github.com/muzudho/rust_kifuwarabe_shell.git?rev=c9b46b56d184f692b530f5413d46d6458def98db)",
+ "kifuwarabe_shell 1.0.0 (git+https://github.com/muzudho/rust_kifuwarabe_shell.git?rev=270b39d1a24e6254227985b624154b3ea4430079)",
  "kifuwarabe_state_transition_diagram 0.1.0 (git+https://github.com/muzudho/rust_kifuwarabe_state_transition_diagram.git?rev=aede7bdfe0925a4c260ac19c6355d64469be9b50)",
  "lazy_static 1.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_json 1.0.31 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -187,7 +187,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum cfg-if 0.1.5 (registry+https://github.com/rust-lang/crates.io-index)" = "0c4e7bb64a8ebb0d856483e1e682ea3422f883c5f5615a90d51a2c82fe87fdd3"
 "checksum itoa 0.4.3 (registry+https://github.com/rust-lang/crates.io-index)" = "1306f3464951f30e30d12373d31c79fbd52d236e5e896fd92f96ec7babbbe60b"
 "checksum kifuwarabe_server 0.1.0 (git+https://github.com/muzudho/rust_kifuwarabe_server.git?rev=418539a79d68a5e7abd2fa5e4cca91efe38aa2ea)" = "<none>"
-"checksum kifuwarabe_shell 1.0.0 (git+https://github.com/muzudho/rust_kifuwarabe_shell.git?rev=c9b46b56d184f692b530f5413d46d6458def98db)" = "<none>"
+"checksum kifuwarabe_shell 1.0.0 (git+https://github.com/muzudho/rust_kifuwarabe_shell.git?rev=270b39d1a24e6254227985b624154b3ea4430079)" = "<none>"
 "checksum kifuwarabe_state_transition_diagram 0.1.0 (git+https://github.com/muzudho/rust_kifuwarabe_state_transition_diagram.git?rev=aede7bdfe0925a4c260ac19c6355d64469be9b50)" = "<none>"
 "checksum lazy_static 1.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "ca488b89a5657b0a2ecd45b95609b3e848cf1755da332a0da46e2b2b1cb371a7"
 "checksum libc 0.2.43 (registry+https://github.com/rust-lang/crates.io-index)" = "76e3a3ef172f1a0b9a9ff0dd1491ae5e6c948b94479a3021819ba7d860c8645d"

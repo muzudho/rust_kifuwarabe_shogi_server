@@ -82,11 +82,6 @@ pub fn on_received_from_client_shogi(req: &Request, res: &mut Response) {
         .get_mut(&req.get_connection_number())
     {
         Some(shell) => {
-            println!(
-                "client_handle_impl.rs/on_received_from_client_shogi/shell current [{}]",
-                shell.get_current()
-            );
-
             match SHELL_VAR_MAP
                 .try_write()
                 .unwrap()
@@ -99,10 +94,15 @@ pub fn on_received_from_client_shogi(req: &Request, res: &mut Response) {
                     shell_var.set_message_to_client("");
                     {
                         let mut diagram = DIAGRAM.try_write().unwrap();
+                        println!("client_handle_impl.rs/on_received_from_client_shogi/ダイアグラムの入り口: [{}].", diagram.get_entry_point());
+                        // ダイアグラムの入り口に遷移。
+                        shell.enter(&diagram);
+                        println!("client_handle_impl.rs/on_received_from_client_shogi/シェルのカレント: [{}].", shell.get_current());
                         // ********************************************************************************
                         // * コマンドライン解析。                                                           *
                         // ********************************************************************************
                         shell.execute_line(&mut diagram, shell_var, &req.get_message());
+                        println!("client_handle_impl.rs/on_received_from_client_shogi/コマンドライン解析後のシェルのカレント: [{}].", shell.get_current());
                     }
 
                     let message_to_client = shell_var.get_message_to_client();
